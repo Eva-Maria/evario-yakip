@@ -21,26 +21,32 @@ public class Launcher {
     };
 
     public static void main(String... args) throws IOException {
+        String hostName = Config.HOSTNAME;
+        long seed = Config.CLIENT_SEED;
+//        wrapSystemOut();
 
         if (args.length >= 1) {
-            if (args[0].equals(MODE_AUTO)) {
+            hostName = args[0];
+        }
+        if (args.length >= 2) {
+            if (args[1].equals(MODE_AUTO)) {
                 new Thread(serverLauncher).start();
-                new Client();
-                new Client();
-                new Client();
+                new Client(hostName, seed);
+                new Client(hostName, seed);
+                new Client(hostName, seed);
                 return;
             }
 
-            if (args[0].equals(MODE_FULLAUTO)) {
+            if (args[1].equals(MODE_FULLAUTO)) {
                 new Thread(serverLauncher).start();
-                new Client();
-                new Client();
-                new Client();
-                new Client();
+                new Client(hostName, seed);
+                new Client(hostName, seed);
+                new Client(hostName, seed);
+                new Client(hostName, seed);
                 return;
             }
         }
 
-        new Client();
+        new Client(hostName, seed);
     }
 }

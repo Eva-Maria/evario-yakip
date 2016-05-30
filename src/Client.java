@@ -30,11 +30,15 @@ public class Client implements Runnable {
 
         Random rnd = new Random(seed);
         while (network.isAlive()) {
-            for (int i = 0; i < 3; ++i) {
-                network.setMoveDirection(i, rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f);
-                network.getMyPlayerNumber();
-                network.getX(network.getMyPlayerNumber(), 1);
-                network.isWall(3, 5);
+            for (int stone = 0; stone < 3; ++stone) {
+                if (stone == 0 && rnd.nextBoolean()) {
+                    network.setMoveDirection(stone, 0.0f, 0.0f);
+                } else {
+                    network.setMoveDirection(stone, rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f);
+                }
+//                network.getMyPlayerNumber();
+//                network.getX(network.getMyPlayerNumber(), 1);
+//                network.isWall(3, 5);
                 /*ColorChange cc;
                 while ((cc = network.getNextColorChange()) != null) {
                     //TODO farben in spielbrett einarbeiten

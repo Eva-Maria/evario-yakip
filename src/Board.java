@@ -20,6 +20,7 @@ public class Board {
     final static String YELLOW_COLOR = (char) 27 + "[93m";
 
     private int fields[][] = new int[MAX_Y][MAX_X];
+    private int playerPoints[] = new int[4];
 
     public Board() {
         for (int y = 0; y < Board.MAX_Y; y++) {
@@ -33,6 +34,16 @@ public class Board {
         if (x == 0 && y == 0 && value == 0) {
             return;
         }
+
+        if (value >= PLAYER_0 && value <= PLAYER_3) {
+            playerPoints[value]++;
+
+            int oldValue = fields[y][x];
+            if (oldValue >= PLAYER_0 && oldValue <= PLAYER_3) {
+                playerPoints[oldValue]--;
+            }
+        }
+
 //        System.out.println("x: " + x + " y: " + y + ", value: " + value);
         fields[y][x] = value;
     }
@@ -59,6 +70,10 @@ public class Board {
             }
             builder.append("\n");
         }
+        builder.append(RED_COLOR).append(PLAYER_0).append(":").append(playerPoints[PLAYER_0]).append(BLACK_COLOR).append(" ");
+        builder.append(BLUE_COLOR).append(PLAYER_1).append(":").append(playerPoints[PLAYER_1]).append(BLACK_COLOR).append(" ");
+        builder.append(YELLOW_COLOR).append(PLAYER_2).append(":").append(playerPoints[PLAYER_2]).append(BLACK_COLOR).append(" ");
+        builder.append(GREEN_COLOR).append(PLAYER_3).append(":").append(playerPoints[PLAYER_3]).append(BLACK_COLOR).append(" ");
         builder.append("\n");
         return builder.toString();
     }

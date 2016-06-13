@@ -1,3 +1,4 @@
+import lenz.htw.yakip.ColorChange;
 import lenz.htw.yakip.net.NetworkClient;
 
 import java.util.Random;
@@ -28,6 +29,8 @@ public class Client implements Runnable {
 
         NetworkClient network = new NetworkClient(hostname, Config.TEAM_NAME);
 
+        setWallOnBoard(network);
+
         Random rnd = new Random(seed);
         while (network.isAlive()) {
             for (int stone = 0; stone < 3; ++stone) {
@@ -38,12 +41,23 @@ public class Client implements Runnable {
                 }
 //                network.getMyPlayerNumber();
 //                network.getX(network.getMyPlayerNumber(), 1);
-//                network.isWall(3, 5);
-                /*ColorChange cc;
+
+                ColorChange cc;
                 while ((cc = network.getNextColorChange()) != null) {
                     //TODO farben in spielbrett einarbeiten
-                }*/
+                }
             }
         }
+    }
+
+    private void setWallOnBoard(NetworkClient network) {
+        for (int y = 0; y < Board.MAX_Y; y++) {
+            for (int x = 0; x < Board.MAX_X; x++) {
+                if (network.isWall(x, y)) {
+                    Board.setField(x, y, Board.WALL);
+                }
+            }
+        }
+        System.out.println(Board.draw());
     }
 }

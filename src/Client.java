@@ -21,15 +21,9 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         NetworkClient network = new NetworkClient(hostname, Config.TEAM_NAME);
-
-        setWallOnBoard(network);
+        Board board = new Board();
+        initBoardWithWall(board, network);
 
         Random rnd = new Random(seed);
         while (network.isAlive()) {
@@ -42,22 +36,38 @@ public class Client implements Runnable {
 //                network.getMyPlayerNumber();
 //                network.getX(network.getMyPlayerNumber(), 1);
 
-                ColorChange cc;
-                while ((cc = network.getNextColorChange()) != null) {
-                    //TODO farben in spielbrett einarbeiten
-                }
+                updateBoardWithColors(board, network);
+
+                printAndWait(board, network);
             }
         }
     }
 
-    private void setWallOnBoard(NetworkClient network) {
+    private void printAndWait(Board board, NetworkClient network) {
+        if (network.getMyPlayerNumber() == 0) {
+            System.out.println(board);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateBoardWithColors(Board board, NetworkClient network) {
+        ColorChange cc;
+        while ((cc = network.getNextColorChange()) != null) {
+            board.setField(cc.x, cc.y, cc.newColor);
+        }
+    }
+
+    private void initBoardWithWall(Board board, NetworkClient network) {
         for (int y = 0; y < Board.MAX_Y; y++) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 if (network.isWall(x, y)) {
-                    Board.setField(x, y, Board.WALL);
+                    board.setField(x, y, Board.WALL);
                 }
             }
         }
-        System.out.println(Board.draw());
     }
 }

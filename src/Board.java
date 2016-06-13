@@ -5,22 +5,55 @@ public class Board {
 
     public static final int MAX_Y = 32;
     public static final int MAX_X = 32;
-    private static int fields[][] = new int[MAX_Y][MAX_X];
 
+    public static final int EMPTY = -2;
     public static final int WALL = -1;
+    public static final int PLAYER_0 = 0;
+    public static final int PLAYER_1 = 1;
+    public static final int PLAYER_2 = 2;
+    public static final int PLAYER_3 = 3;
 
-    public static void setField(int x, int y, int value) {
+    final static String BLACK_COLOR = (char) 27 + "[30m";
+    final static String BLUE_COLOR = (char) 27 + "[34m";
+    final static String RED_COLOR = (char) 27 + "[31m";
+    final static String GREEN_COLOR = (char) 27 + "[32m";
+    final static String YELLOW_COLOR = (char) 27 + "[93m";
+
+    private int fields[][] = new int[MAX_Y][MAX_X];
+
+    public Board() {
+        for (int y = 0; y < Board.MAX_Y; y++) {
+            for (int x = 0; x < Board.MAX_X; x++) {
+                setField(x, y, EMPTY);
+            }
+        }
+    }
+
+    public void setField(int x, int y, int value) {
+        if (x == 0 && y == 0 && value == 0) {
+            return;
+        }
+//        System.out.println("x: " + x + " y: " + y + ", value: " + value);
         fields[y][x] = value;
     }
 
-    public static String draw() {
+    @Override
+    public String toString() {
         StringBuilder builder = new StringBuilder();
         for (int y = 0; y < Board.MAX_Y; y++) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 int field = fields[y][x];
                 if (field == WALL) {
                     builder.append("x");
-                } else {
+                } else if (field == PLAYER_0) {
+                    builder.append(RED_COLOR).append(PLAYER_0).append(BLACK_COLOR);
+                } else if (field == PLAYER_1) {
+                    builder.append(BLUE_COLOR).append(PLAYER_1).append(BLACK_COLOR);
+                } else if (field == PLAYER_2) {
+                    builder.append(YELLOW_COLOR).append(PLAYER_2).append(BLACK_COLOR);
+                } else if (field == PLAYER_3) {
+                    builder.append(GREEN_COLOR).append(PLAYER_3).append(BLACK_COLOR);
+                } else if (field == EMPTY) {
                     builder.append(" ");
                 }
             }

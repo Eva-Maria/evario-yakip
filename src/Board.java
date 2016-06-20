@@ -51,21 +51,21 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int y = 0; y < Board.MAX_Y; y++) {
+        for (int y = Board.MAX_Y-1; y >= 0; y--) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 int field = fields[y][x];
                 if (field == WALL) {
-                    builder.append("x");
+                    builder.append("x").append(" ");
                 } else if (field == PLAYER_0) {
-                    builder.append(RED_COLOR).append(PLAYER_0).append(BLACK_COLOR);
+                    builder.append(RED_COLOR).append(PLAYER_0).append(BLACK_COLOR).append(" ");
                 } else if (field == PLAYER_1) {
-                    builder.append(BLUE_COLOR).append(PLAYER_1).append(BLACK_COLOR);
+                    builder.append(BLUE_COLOR).append(PLAYER_1).append(BLACK_COLOR).append(" ");
                 } else if (field == PLAYER_2) {
-                    builder.append(YELLOW_COLOR).append(PLAYER_2).append(BLACK_COLOR);
+                    builder.append(YELLOW_COLOR).append(PLAYER_2).append(BLACK_COLOR).append(" ");
                 } else if (field == PLAYER_3) {
-                    builder.append(GREEN_COLOR).append(PLAYER_3).append(BLACK_COLOR);
+                    builder.append(GREEN_COLOR).append(PLAYER_3).append(BLACK_COLOR).append(" ");
                 } else if (field == EMPTY) {
-                    builder.append(" ");
+                    builder.append(" ").append(" ");
                 }
             }
             builder.append("\n");

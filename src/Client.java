@@ -39,7 +39,10 @@ public class Client implements Runnable {
 
                 updateBoardWithPlayerPosition(board, network);
                 updateBoardWithColors(board, network);
-                algorithm.getNextPath();
+
+                if (network.getMyPlayerNumber() == 0) {
+                    algorithm.getNextPath();
+                }
 
                 printAndWait(board, network);
             }

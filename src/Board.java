@@ -8,21 +8,23 @@ public class Board {
 
     public static final int EMPTY = -2;
     public static final int WALL = -1;
-    public static final int PLAYER_0 = 0;
-    public static final int PLAYER_1 = 1;
-    public static final int PLAYER_2 = 2;
-    public static final int PLAYER_3 = 3;
 
-    final static String BLACK_COLOR = (char) 27 + "[30m";
-    final static String BLUE_COLOR = (char) 27 + "[34m";
-    final static String RED_COLOR = (char) 27 + "[31m";
-    final static String GREEN_COLOR = (char) 27 + "[32m";
-    final static String YELLOW_COLOR = (char) 27 + "[93m";
+    final static String RESET_OUTPUT_COLOR = (char) 27 + "[0m";
+    final static String[] PLAYER_OUTPUT_COLORS = new String[]{
+            (char) 27 + "[31m", // red
+            (char) 27 + "[34m", // blue
+            (char) 27 + "[93m", // yellow
+            (char) 27 + "[32m", // green
+    };
 
+    private final int myPlayerNumber;
     private int fields[][] = new int[MAX_Y][MAX_X];
+    private float[][] playerPosition = new float[3][];
+
     private int playerPoints[] = new int[4];
 
-    public Board() {
+    public Board(int myPlayerNumber) {
+        this.myPlayerNumber = myPlayerNumber;
         for (int y = 0; y < Board.MAX_Y; y++) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 setField(x, y, EMPTY);
@@ -30,16 +32,20 @@ public class Board {
         }
     }
 
+    public void setPlayerPosition(int stoneNumber, float x, float y) {
+        playerPosition[stoneNumber] = new float[]{x, y};
+    }
+
     public void setField(int x, int y, int value) {
         if (x == 0 && y == 0 && value == 0) {
             return;
         }
 
-        if (value >= PLAYER_0 && value <= PLAYER_3) {
+        if (value >= 0 && value <= 3) {
             playerPoints[value]++;
 
             int oldValue = fields[y][x];
-            if (oldValue >= PLAYER_0 && oldValue <= PLAYER_3) {
+            if (oldValue >= 0 && oldValue <= 3) {
                 playerPoints[oldValue]--;
             }
         }
@@ -51,29 +57,47 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int y = Board.MAX_Y-1; y >= 0; y--) {
+        for (int y = Board.MAX_Y - 1; y >= 0; y--) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 int field = fields[y][x];
+
                 if (field == WALL) {
-                    builder.append("x").append(" ");
-                } else if (field == PLAYER_0) {
-                    builder.append(RED_COLOR).append(PLAYER_0).append(BLACK_COLOR).append(" ");
-                } else if (field == PLAYER_1) {
-                    builder.append(BLUE_COLOR).append(PLAYER_1).append(BLACK_COLOR).append(" ");
-                } else if (field == PLAYER_2) {
-                    builder.append(YELLOW_COLOR).append(PLAYER_2).append(BLACK_COLOR).append(" ");
-                } else if (field == PLAYER_3) {
-                    builder.append(GREEN_COLOR).append(PLAYER_3).append(BLACK_COLOR).append(" ");
+                    builder.append("x");
                 } else if (field == EMPTY) {
-                    builder.append(" ").append(" ");
+                    builder.append(" ");
+                } else {
+                    String playerOutputColor = PLAYER_OUTPUT_COLORS[field];
+                    builder.append(playerOutputColor).append('#').append(RESET_OUTPUT_COLOR);
+                }
+
+                boolean hasStone = false;
+
+                for (int stone = 0; stone < 3; stone++) {
+                    float[] position = playerPosition[stone];
+                    int playerPosX = (int) position[0];
+                    int playerPosY = (int) position[1];
+
+                    if (playerPosX == x && playerPosY == y) {
+                        hasStone = true;
+                        String playerOutputColor = PLAYER_OUTPUT_COLORS[myPlayerNumber];
+                        builder.append(playerOutputColor).append(stone).append(RESET_OUTPUT_COLOR);
+                        break;
+                    }
+                }
+
+                if (!hasStone) {
+                    builder.append(" ");
                 }
             }
             builder.append("\n");
         }
-        builder.append(RED_COLOR).append(PLAYER_0).append(":").append(playerPoints[PLAYER_0]).append(BLACK_COLOR).append(" ");
-        builder.append(BLUE_COLOR).append(PLAYER_1).append(":").append(playerPoints[PLAYER_1]).append(BLACK_COLOR).append(" ");
-        builder.append(YELLOW_COLOR).append(PLAYER_2).append(":").append(playerPoints[PLAYER_2]).append(BLACK_COLOR).append(" ");
-        builder.append(GREEN_COLOR).append(PLAYER_3).append(":").append(playerPoints[PLAYER_3]).append(BLACK_COLOR).append(" ");
+
+        for (int player = 0; player < 4; player++) {
+            String playerOutputColor = PLAYER_OUTPUT_COLORS[player];
+            int points = playerPoints[player];
+            builder.append(playerOutputColor).append(player).append(":").append(points).append(RESET_OUTPUT_COLOR).append(" ");
+        }
+
         builder.append("\n");
         return builder.toString();
     }

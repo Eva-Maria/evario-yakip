@@ -22,7 +22,7 @@ public class Client implements Runnable {
     @Override
     public void run() {
         NetworkClient network = new NetworkClient(hostname, Config.TEAM_NAME);
-        Board board = new Board();
+        Board board = new Board(network.getMyPlayerNumber());
         initBoardWithWall(board, network);
 
         Random rnd = new Random(seed);
@@ -36,10 +36,20 @@ public class Client implements Runnable {
 //                network.getMyPlayerNumber();
 //                network.getX(network.getMyPlayerNumber(), 1);
 
+                updateBoardWithPlayerPosition(board, network);
                 updateBoardWithColors(board, network);
 
                 printAndWait(board, network);
             }
+        }
+    }
+
+    private void updateBoardWithPlayerPosition(Board board, NetworkClient network) {
+        int myPlayerNumber = network.getMyPlayerNumber();
+        for (int stone = 0; stone < 3; stone++) {
+            float x = network.getX(myPlayerNumber, stone);
+            float y = network.getY(myPlayerNumber, stone);
+            board.setPlayerPosition(stone, x, y);
         }
     }
 

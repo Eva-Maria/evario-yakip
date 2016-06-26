@@ -19,6 +19,15 @@ public class Board {
 
     private final int myPlayerNumber;
     private int fields[][] = new int[MAX_Y][MAX_X];
+
+    public int[][] getFields() {
+        return fields;
+    }
+
+    public float[][] getPlayerPosition() {
+        return playerPosition;
+    }
+
     private float[][] playerPosition = new float[3][];
 
     private int playerPoints[] = new int[4];

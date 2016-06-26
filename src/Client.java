@@ -24,6 +24,7 @@ public class Client implements Runnable {
         NetworkClient network = new NetworkClient(hostname, Config.TEAM_NAME);
         Board board = new Board(network.getMyPlayerNumber());
         initBoardWithWall(board, network);
+        Algorithm algorithm = new Algorithm(board, network);
 
         Random rnd = new Random(seed);
         while (network.isAlive()) {
@@ -38,6 +39,7 @@ public class Client implements Runnable {
 
                 updateBoardWithPlayerPosition(board, network);
                 updateBoardWithColors(board, network);
+                algorithm.getNextPath();
 
                 printAndWait(board, network);
             }

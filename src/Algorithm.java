@@ -23,11 +23,32 @@ public class Algorithm {
     public int[] getNextPath() {
         final int[][] fields = board.getFields();
 
-        final float[][] playerPosition = board.getPlayerPosition();
+        final float[][] stonePosition = board.getStonePosition();
 
-        final int[][] nodeList = createNodeList(playerPosition[0]);
+        final int[][] nodeList = createNodeList(stonePosition[0]);
+
+//        System.out.println("Start: " + Arrays.toString(stonePosition[0]));
+//        System.out.println("NodeList: ");
+//        Arrays.stream(nodeList).forEach(ints -> System.out.print(Arrays.toString(ints) + "|"));
+//        System.out.println();
+
         final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
+
+//        for (int[] m : weightMatrix) {
+//            for (int n : m) {
+//                System.out.print(n + " ");
+//            }
+//            System.out.println();
+//        }
+
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
+
+        int i = 0;
+        for (int[] row : adjacencyMatrix) {
+            System.out.println(i + " > " + Arrays.toString(row));
+            i++;
+        }
+
         final int[] shortestPath = dijkstra(adjacencyMatrix);
         final int[] coordinates = getCoordinatesFromPath(shortestPath, nodeList, fields);
 
@@ -40,7 +61,6 @@ public class Algorithm {
 
         final int playerPosX = (int) currentPosition[0];
         final int playerPosY = (int) currentPosition[1];
-        System.out.println(playerPosX + "," + playerPosY);
 
         for (int y = playerPosY - CLUSTER_SIZE; y < playerPosY + CLUSTER_SIZE; y++) {
             if (y < 0 || y > Board.MAX_Y) {
@@ -53,7 +73,6 @@ public class Algorithm {
                 }
 
                 final int[] fieldCoordinates = new int[]{x, y};
-                System.out.println(Arrays.toString(fieldCoordinates));
                 nodeList[currentNodeIndex] = fieldCoordinates;
                 currentNodeIndex++;
             }
@@ -96,7 +115,7 @@ public class Algorithm {
 
             // TODO: maybe less iteration by better data structure
             for (int toNodeIndex = 1; toNodeIndex < nodeList.length; toNodeIndex++) {
-                final int[] toFieldCoordinates = nodeList[startNodeIndex];
+                final int[] toFieldCoordinates = nodeList[toNodeIndex];
                 final int toX = toFieldCoordinates[0];
                 final int toY = toFieldCoordinates[1];
 

@@ -17,20 +17,10 @@ public class Board {
             (char) 27 + "[32m", // green
     };
 
-    private final int myPlayerNumber;
-    private int fields[][] = new int[MAX_Y][MAX_X];
-
-    public int[][] getFields() {
-        return fields;
-    }
-
-    public float[][] getPlayerPosition() {
-        return playerPosition;
-    }
-
-    private float[][] playerPosition = new float[3][];
-
-    private int playerPoints[] = new int[4];
+    private final int myPlayerNumber; // 0..3 players
+    private int fields[][] = new int[MAX_Y][MAX_X]; // 0..31 by 0..31 field coordinates
+    private float[][] stonePosition = new float[3][]; // 0..2 stones by 0..31 field coordinates
+    private int playerPoints[] = new int[4]; // 0..3 players by points
 
     public Board(int myPlayerNumber) {
         this.myPlayerNumber = myPlayerNumber;
@@ -41,8 +31,16 @@ public class Board {
         }
     }
 
-    public void setPlayerPosition(int stoneNumber, float x, float y) {
-        playerPosition[stoneNumber] = new float[]{x, y};
+    public int[][] getFields() {
+        return fields;
+    }
+
+    public float[][] getStonePosition() {
+        return stonePosition;
+    }
+
+    public void setStonePosition(int stoneNumber, float x, float y) {
+        stonePosition[stoneNumber] = new float[]{x, y};
     }
 
     public void setField(int x, int y, int value) {
@@ -82,7 +80,7 @@ public class Board {
                 boolean hasStone = false;
 
                 for (int stone = 0; stone < 3; stone++) {
-                    float[] position = playerPosition[stone];
+                    float[] position = stonePosition[stone];
                     int playerPosX = (int) position[0];
                     int playerPosY = (int) position[1];
 

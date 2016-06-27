@@ -54,7 +54,7 @@ public class Client implements Runnable {
         for (int stone = 0; stone < 3; stone++) {
             float x = network.getX(myPlayerNumber, stone);
             float y = network.getY(myPlayerNumber, stone);
-            board.setPlayerPosition(stone, x, y);
+            board.setStonePosition(stone, x, y);
         }
     }
 
@@ -62,7 +62,7 @@ public class Client implements Runnable {
         if (network.getMyPlayerNumber() == 0) {
             System.out.println(board);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Created by eve on 6/13/16.
  */
@@ -10,6 +12,7 @@ public class Board {
     public static final int WALL = -1;
 
     final static String RESET_OUTPUT_COLOR = (char) 27 + "[0m";
+    final static String UNDERLINE_OUTPUT_COLOR = (char) 27 + "[4m";
     final static String[] PLAYER_OUTPUT_COLORS = new String[]{
             (char) 27 + "[31m", // red
             (char) 27 + "[34m", // blue
@@ -63,11 +66,26 @@ public class Board {
 
     @Override
     public String toString() {
+        return toString(new int[0], new int[0][]);
+    }
+
+
+    public String toString(final int[] distances, int[][] nodeList) {
+        final int[][] shortestPathFieldCoordinates = new int[distances.length][];
+
+        System.out.println(Arrays.toString(distances));
+        for (int i = 0; i < distances.length; i++) {
+            final int[] currentFieldCoordinates = nodeList[i];
+            shortestPathFieldCoordinates[i] = currentFieldCoordinates;
+        }
+
         StringBuilder builder = new StringBuilder();
         for (int y = 0; y < Board.MAX_Y; y++) {
 //        for (int y = Board.MAX_Y - 1; y >= 0; y--) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 int field = fields[y][x];
+
+                //////////
 
                 if (field == WALL) {
                     builder.append("x");
@@ -77,6 +95,8 @@ public class Board {
                     String playerOutputColor = PLAYER_OUTPUT_COLORS[field];
                     builder.append(playerOutputColor).append('#').append(RESET_OUTPUT_COLOR);
                 }
+
+                //////////
 
                 boolean hasStone = false;
 
@@ -96,6 +116,32 @@ public class Board {
                 if (!hasStone) {
                     builder.append(" ");
                 }
+
+                //////////
+
+                boolean hasDistance = false;
+                for (int i = 0; i < shortestPathFieldCoordinates.length; i++) {
+                    int[] shortestPathFieldCoordinate = shortestPathFieldCoordinates[i];
+                    final int spX = shortestPathFieldCoordinate[0];
+                    final int spY = shortestPathFieldCoordinate[1];
+                    if (spX == x && spY == y) {
+                        final int distance = distances[i];
+                        if (distance > 9) {
+                            builder.append("?");
+                        } else {
+                            builder.append(distance);
+                        }
+                        hasDistance = true;
+                        break;
+                    }
+                }
+
+                if (!hasDistance) {
+                    builder.append(" ");
+                }
+
+                //////////
+
             }
             builder.append("\n");
         }

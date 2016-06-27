@@ -35,7 +35,6 @@ public class Client implements Runnable {
 
                 if (network.getMyPlayerNumber() == 0 && stone == 0) {
                     algorithm.getNextPath(stone);
-//                    System.out.println(board);
                     wait(500);
                 } else {
                     if (stone == 0 && rnd.nextBoolean()) {

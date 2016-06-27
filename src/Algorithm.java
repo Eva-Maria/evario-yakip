@@ -7,6 +7,7 @@ public class Algorithm {
     public static final int NO_WAY = 0;
     public static final int CLUSTER_SIZE = 4;
     public static final int MAX_PATH_LENGTH = (CLUSTER_SIZE + CLUSTER_SIZE + 1) * (CLUSTER_SIZE + CLUSTER_SIZE + 1);
+    public static final int STONE_TOTAL_POSITION_IN_CLUSTER = MAX_PATH_LENGTH / 2;
 
     private final Board board;
     private final int myPlayerNumber;
@@ -49,7 +50,11 @@ public class Algorithm {
 //        }
 
         final int[] shortestPath = dijkstra(adjacencyMatrix);
+
+        System.out.println(board.toString(shortestPath, nodeList));
+
         final int[] coordinates = getCoordinatesFromPath(shortestPath, currentPosition, nodeList);
+
 
         return coordinates;
     }
@@ -142,7 +147,7 @@ public class Algorithm {
         return toTest >= start && toTest <= stop;
     }
 
-    private int[] dijkstra(int[][] distanceMatrix) {
+    private int[] dijkstra(int[][] adjacencyMatrix) {
         final int distance[] = new int[MAX_PATH_LENGTH];
         final boolean isIncluded[] = new boolean[MAX_PATH_LENGTH];
 
@@ -150,7 +155,7 @@ public class Algorithm {
             distance[i] = Integer.MAX_VALUE;
         }
 
-        distance[0] = 0;
+        distance[STONE_TOTAL_POSITION_IN_CLUSTER] = 0;
 
         for (int count = 0; count < MAX_PATH_LENGTH - 1; count++) {
             final int u = minDistance(distance, isIncluded);
@@ -158,7 +163,7 @@ public class Algorithm {
             isIncluded[u] = true;
 
             for (int v = 0; v < MAX_PATH_LENGTH; v++) {
-                final int distanceUV = distanceMatrix[u][v];
+                final int distanceUV = adjacencyMatrix[u][v];
                 final int currentDistance = distance[u];
                 final int nextNodeDistance = distance[v];
 
@@ -187,11 +192,6 @@ public class Algorithm {
     }
 
     private int[] getCoordinatesFromPath(int[] shortestPath, float[] startFieldCoordinates, int[][] nodeList) {
-        final int firstNode = shortestPath[0];
-        final int[] toFieldCoordinates = nodeList[firstNode];
-
-
-
 
         //TODO: translate to vector
         return null;

@@ -34,12 +34,12 @@ public class Algorithm {
 
         final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
 
-//        for (int[] m : weightMatrix) {
-//            for (int n : m) {
-//                System.out.print(n + " ");
-//            }
-//            System.out.println();
-//        }
+        for (int[] m : weightMatrix) {
+            for (int n : m) {
+                System.out.print(n + " ");
+            }
+            System.out.println();
+        }
 
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
 
@@ -119,12 +119,14 @@ public class Algorithm {
                 final int toX = toFieldCoordinates[0];
                 final int toY = toFieldCoordinates[1];
 
-                if (!withinLimit(toX, startX - 1, startX + 1) || !withinLimit(toY, startY - 1, startY + 1)) {
+                boolean isNotNeighbour = !withinLimit(toX, startX - 1, startX + 1) || !withinLimit(toY, startY - 1, startY + 1);
+                if (isNotNeighbour) {
                     continue;
                 }
 
                 int weight = 0;
-                if (toX != startX && toY != startY) {
+                boolean isNotMyself = !(toX == startX && toY == startY);
+                if (isNotMyself) {
                     weight = weightMatrix[toY][toX];
                 }
 

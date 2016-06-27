@@ -29,22 +29,22 @@ public class Client implements Runnable {
         Random rnd = new Random(seed);
         while (network.isAlive()) {
             for (int stone = 0; stone < 3; ++stone) {
-                if (stone == 0 && rnd.nextBoolean()) {
-                    network.setMoveDirection(stone, 0.0f, 0.0f);
-                } else {
-                    network.setMoveDirection(stone, rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f);
-                }
-//                network.getMyPlayerNumber();
-//                network.getX(network.getMyPlayerNumber(), 1);
 
                 updateBoardWithPlayerPosition(board, network);
                 updateBoardWithColors(board, network);
 
-                if (network.getMyPlayerNumber() == 0) {
-                    algorithm.getNextPath();
+                if (network.getMyPlayerNumber() == 0 && stone == 0) {
+                    algorithm.getNextPath(stone);
+//                    System.out.println(board);
+                    wait(500);
+                } else {
+                    if (stone == 0 && rnd.nextBoolean()) {
+                        network.setMoveDirection(stone, 0.0f, 0.0f);
+                    } else {
+                        network.setMoveDirection(stone, rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f);
+                    }
+                    wait(2000);
                 }
-
-                printAndWait(board, network);
             }
         }
     }
@@ -58,15 +58,12 @@ public class Client implements Runnable {
         }
     }
 
-    private void printAndWait(Board board, NetworkClient network) {
-        if (network.getMyPlayerNumber() == 0) {
-            System.out.println(board);
+    private void wait(int timeout) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(timeout);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
     }
 
     private void updateBoardWithColors(Board board, NetworkClient network) {

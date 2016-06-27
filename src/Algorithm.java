@@ -1,14 +1,12 @@
 import lenz.htw.yakip.net.NetworkClient;
 
-import java.util.Arrays;
-
 /**
  * Created by m on 6/26/16.
  */
 public class Algorithm {
     public static final int NO_WAY = 0;
-    public static final int CLUSTER_SIZE = 5;
-    public static final int MAX_PATH_LENGTH = CLUSTER_SIZE * CLUSTER_SIZE * 4;
+    public static final int CLUSTER_SIZE = 4;
+    public static final int MAX_PATH_LENGTH = (CLUSTER_SIZE + CLUSTER_SIZE + 1) * (CLUSTER_SIZE + CLUSTER_SIZE + 1);
 
     private final Board board;
     private final int myPlayerNumber;
@@ -20,12 +18,13 @@ public class Algorithm {
         this.myPlayerNumber = network.getMyPlayerNumber();
     }
 
-    public int[] getNextPath() {
+    public int[] getNextPath(int stone) {
         final int[][] fields = board.getFields();
 
         final float[][] stonePosition = board.getStonePosition();
 
-        final int[][] nodeList = createNodeList(stonePosition[0]);
+        float[] currentPosition = stonePosition[stone];
+        final int[][] nodeList = createNodeList(currentPosition);
 
 //        System.out.println("Start: " + Arrays.toString(stonePosition[0]));
 //        System.out.println("NodeList: ");
@@ -34,25 +33,25 @@ public class Algorithm {
 
         final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
 
-        for (int[] m : weightMatrix) {
+      /*  for (int[] m : weightMatrix) {
             for (int n : m) {
                 System.out.print(n + " ");
             }
             System.out.println();
-        }
+        }*/
 
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
 
         int i = 0;
-        for (int[] row : adjacencyMatrix) {
-            System.out.println(i + " > " + Arrays.toString(row));
-            i++;
-        }
+//        for (int[] row : adjacencyMatrix) {
+//            System.out.println(i + " > " + Arrays.toString(row));
+//            i++;
+//        }
 
         final int[] shortestPath = dijkstra(adjacencyMatrix);
-        final int[] coordinates = getCoordinatesFromPath(shortestPath, nodeList, fields);
+        final int[] coordinates = getCoordinatesFromPath(shortestPath, currentPosition, nodeList);
 
-        return null;
+        return coordinates;
     }
 
     private static int[][] createNodeList(float[] currentPosition) {
@@ -62,12 +61,12 @@ public class Algorithm {
         final int playerPosX = (int) currentPosition[0];
         final int playerPosY = (int) currentPosition[1];
 
-        for (int y = playerPosY - CLUSTER_SIZE; y < playerPosY + CLUSTER_SIZE; y++) {
+        for (int y = playerPosY - CLUSTER_SIZE; y <= playerPosY + CLUSTER_SIZE; y++) {
             if (y < 0 || y > Board.MAX_Y) {
                 continue;
             }
 
-            for (int x = playerPosX - CLUSTER_SIZE; x < playerPosX + CLUSTER_SIZE; x++) {
+            for (int x = playerPosX - CLUSTER_SIZE; x <= playerPosX + CLUSTER_SIZE; x++) {
                 if (x < 0 || x > Board.MAX_X) {
                     continue;
                 }
@@ -94,10 +93,11 @@ public class Algorithm {
             } else if (field == Board.EMPTY) {
                 weight = 2;
             } else if (field == myPlayerNumber) {
-                weight = 3;
+                weight = 3; // our color
             } else {
-                weight = 1;
+                weight = 1; // opponent color field
             }
+            //TODO: optimisation, avoid fields with ourself
 
             distanceMatrix[y][x] = weight;
         }
@@ -186,11 +186,14 @@ public class Algorithm {
         return minIndex;
     }
 
-    private int[] getCoordinatesFromPath(int[] shortestPath, int[][] nodeList, int[][] fields) {
+    private int[] getCoordinatesFromPath(int[] shortestPath, float[] startFieldCoordinates, int[][] nodeList) {
         final int firstNode = shortestPath[0];
-        final int[] fieldCoordinates = nodeList[firstNode];
+        final int[] toFieldCoordinates = nodeList[firstNode];
+
+
+
 
         //TODO: translate to vector
-        return fieldCoordinates;
+        return null;
     }
 }

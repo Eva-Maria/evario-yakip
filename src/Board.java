@@ -64,7 +64,8 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int y = Board.MAX_Y - 1; y >= 0; y--) {
+        for (int y = 0; y < Board.MAX_Y; y++) {
+//        for (int y = Board.MAX_Y - 1; y >= 0; y--) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 int field = fields[y][x];
 

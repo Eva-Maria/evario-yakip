@@ -25,30 +25,11 @@ public class Algorithm {
         final float[][] stonePosition = board.getStonePosition();
 
         float[] currentPosition = stonePosition[stone];
+
+        // nodeList[0] = new int[] {x,y} field coordinates
         final int[][] nodeList = createNodeList(currentPosition);
-
-//        System.out.println("Start: " + Arrays.toString(stonePosition[0]));
-//        System.out.println("NodeList: ");
-//        Arrays.stream(nodeList).forEach(ints -> System.out.print(Arrays.toString(ints) + "|"));
-//        System.out.println();
-
         final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
-
-      /*  for (int[] m : weightMatrix) {
-            for (int n : m) {
-                System.out.print(n + " ");
-            }
-            System.out.println();
-        }*/
-
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
-
-        int i = 0;
-//        for (int[] row : adjacencyMatrix) {
-//            System.out.println(i + " > " + Arrays.toString(row));
-//            i++;
-//        }
-
         final int[] distances = dijkstra(adjacencyMatrix);
 
         System.out.println(board.toString(distances, nodeList));
@@ -57,7 +38,7 @@ public class Algorithm {
         return null;
     }
 
-    private static int[][] createNodeList(float[] currentPosition) {
+    static int[][] createNodeList(float[] currentPosition) {
         final int[][] nodeList = new int[MAX_PATH_LENGTH][];
         int currentNodeIndex = 0;
 
@@ -82,7 +63,7 @@ public class Algorithm {
         return nodeList;
     }
 
-    private int[][] createWeightMatrix(int[][] nodeList, int[][] fields) {
+    int[][] createWeightMatrix(int[][] nodeList, int[][] fields) {
         final int distanceMatrix[][] = new int[Board.MAX_Y][Board.MAX_X];
 
         for (final int[] fieldCoordinates : nodeList) {
@@ -108,7 +89,7 @@ public class Algorithm {
         return distanceMatrix;
     }
 
-    private static int[][] createAdjacencyMatrix(int[][] nodeList, int[][] weightMatrix) {
+    static int[][] createAdjacencyMatrix(int[][] nodeList, int[][] weightMatrix) {
         final int adjacencyMatrix[][] = new int[nodeList.length][nodeList.length];
 
         for (int startNodeIndex = 0; startNodeIndex < nodeList.length - 1; startNodeIndex++) {
@@ -145,7 +126,8 @@ public class Algorithm {
         return toTest >= start && toTest <= stop;
     }
 
-    private int[] dijkstra(int[][] adjacencyMatrix) {
+    static int[] dijkstra(int[][] adjacencyMatrix) {
+        final int previous[] = new int[MAX_PATH_LENGTH];
         final int distances[] = new int[MAX_PATH_LENGTH];
         final boolean isIncluded[] = new boolean[MAX_PATH_LENGTH];
 
@@ -169,13 +151,14 @@ public class Algorithm {
                         currentDistance != Integer.MAX_VALUE &&
                         currentDistance + distanceUV < nextNodeDistance) {
                     distances[v] = currentDistance + distanceUV;
+                    previous[v] = u;
                 }
             }
         }
         return distances;
     }
 
-    private int minDistance(int[] distance, boolean[] isIncluded) {
+    private static int minDistance(int[] distance, boolean[] isIncluded) {
         int min = Integer.MAX_VALUE;
         int minIndex = -1;
 

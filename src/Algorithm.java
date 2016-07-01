@@ -49,14 +49,12 @@ public class Algorithm {
 //            i++;
 //        }
 
-        final int[] shortestPath = dijkstra(adjacencyMatrix);
+        final int[] distances = dijkstra(adjacencyMatrix);
 
-        System.out.println(board.toString(shortestPath, nodeList));
+        System.out.println(board.toString(distances, nodeList));
 
-        final int[] coordinates = getCoordinatesFromPath(shortestPath, currentPosition, nodeList);
-
-
-        return coordinates;
+//        final int[] coordinates = getCoordinatesFromPath(distances, currentPosition, nodeList);
+        return null;
     }
 
     private static int[][] createNodeList(float[] currentPosition) {
@@ -148,33 +146,33 @@ public class Algorithm {
     }
 
     private int[] dijkstra(int[][] adjacencyMatrix) {
-        final int distance[] = new int[MAX_PATH_LENGTH];
+        final int distances[] = new int[MAX_PATH_LENGTH];
         final boolean isIncluded[] = new boolean[MAX_PATH_LENGTH];
 
         for (int i = 0; i < MAX_PATH_LENGTH; i++) {
-            distance[i] = Integer.MAX_VALUE;
+            distances[i] = Integer.MAX_VALUE;
         }
 
-        distance[STONE_TOTAL_POSITION_IN_CLUSTER] = 0;
+        distances[STONE_TOTAL_POSITION_IN_CLUSTER] = 0;
 
         for (int count = 0; count < MAX_PATH_LENGTH - 1; count++) {
-            final int u = minDistance(distance, isIncluded);
+            final int u = minDistance(distances, isIncluded);
 
             isIncluded[u] = true;
 
             for (int v = 0; v < MAX_PATH_LENGTH; v++) {
                 final int distanceUV = adjacencyMatrix[u][v];
-                final int currentDistance = distance[u];
-                final int nextNodeDistance = distance[v];
+                final int currentDistance = distances[u];
+                final int nextNodeDistance = distances[v];
 
                 if (!isIncluded[v] && distanceUV != NO_WAY &&
                         currentDistance != Integer.MAX_VALUE &&
                         currentDistance + distanceUV < nextNodeDistance) {
-                    distance[v] = currentDistance + distanceUV;
+                    distances[v] = currentDistance + distanceUV;
                 }
             }
         }
-        return distance;
+        return distances;
     }
 
     private int minDistance(int[] distance, boolean[] isIncluded) {

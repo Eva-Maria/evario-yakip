@@ -32,10 +32,10 @@ public class Algorithm {
         final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
         final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix);
+        final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
+        final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0]);
 
-        System.out.println(board.toString(distancesAndPrevious[0], nodeList));
-
-//        final int[] coordinates = getCoordinatesFromPath(distances, currentPosition, nodeList);
+//        final int[] coordinates = getCoordinatesFromPath(bestNode, paths, );
         return null;
     }
 
@@ -215,7 +215,7 @@ public class Algorithm {
         return c;
     }
 
-    static int calcBestNodeFromPathsAndDistances(final int[][] paths, final int[] distances) {
+    static int[] calcBestPathFromPathsAndDistances(final int[][] paths, final int[] distances) {
         int lowestScore = Integer.MAX_VALUE;
         int longestPath = 0;
 
@@ -239,7 +239,7 @@ public class Algorithm {
         }
 
 //        System.out.println("Best node is number " + bestNode + " with score " + lowestScore);
-        return bestNode;
+        return paths[bestNode];
     }
 
     private int[] getCoordinatesFromPath(int[] shortestPath, float[] startFieldCoordinates, int[][] nodeList) {

@@ -34,16 +34,17 @@ public class AlgorithmTest extends TestCase {
 
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
 
-        final int bestNode = Algorithm.calcBestNodeFromPathsAndDistances(paths, distancesAndPrevious[0]);
+        final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0]);
 
         final long stop = System.nanoTime();
         final long diff = stop - start;
         System.out.println("Time needed: " + diff);
 
-        System.out.println("Best node is number " + bestNode);
-        System.out.println("Paths is: " + Arrays.toString(paths[bestNode]));
+        System.out.println("Best node is number " + bestPath[bestPath.length - 1]);
+        System.out.println("Paths is: " + Arrays.toString(bestPath));
 
-        Assert.assertEquals(26, bestNode);
+        Assert.assertEquals(26, bestPath[bestPath.length - 1]);
+        Assert.assertTrue(Arrays.equals(new int[]{40, 41, 51, 43, 35, 26}, bestPath));
     }
 
     static void printMatrix(int[] array) {

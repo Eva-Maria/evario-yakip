@@ -30,7 +30,7 @@ public class AlgorithmTest extends TestCase {
         final int[][] adjacencyMatrix = Algorithm.createAdjacencyMatrix(nodeList, WEIGHT_MATRIX);
 //        printMatrix(adjacencyMatrix);
 
-        final int[][] distancesAndPrevious = Algorithm.dijkstra(adjacencyMatrix);
+        final int[][] distancesAndPrevious = Algorithm.dijkstra(adjacencyMatrix, CURRENT_POSITION, nodeList);
 
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
 

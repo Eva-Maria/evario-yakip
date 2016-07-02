@@ -33,9 +33,17 @@ public class Client implements Runnable {
                 updateBoardWithPlayerPosition(board, network);
                 updateBoardWithColors(board, network);
 
-                if (network.getMyPlayerNumber() == 0 && stone == 0) {
-                    algorithm.getNextPath(stone);
-                    wait(500);
+                if (network.getMyPlayerNumber() == 0) {
+                    if (stone == 1) {
+//                    final float[] nextVector = new float[] {1,1};
+                        final float[] nextVector = algorithm.getNextVector(stone);
+
+                        network.setMoveDirection(stone, nextVector[0], nextVector[1]);
+                        wait(500);
+                    } else {
+                        network.setMoveDirection(stone, 1, 1);
+                        wait(500);
+                    }
                 } else {
                     if (stone == 0 && rnd.nextBoolean()) {
                         network.setMoveDirection(stone, 0.0f, 0.0f);
@@ -58,11 +66,11 @@ public class Client implements Runnable {
     }
 
     private void wait(int timeout) {
-            try {
-                Thread.sleep(timeout);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            Thread.sleep(timeout);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateBoardWithColors(Board board, NetworkClient network) {

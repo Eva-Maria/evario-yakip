@@ -1,5 +1,7 @@
 import lenz.htw.yakip.net.NetworkClient;
 
+import java.util.Arrays;
+
 /**
  * Created by m on 6/26/16.
  */
@@ -8,7 +10,6 @@ public class Algorithm {
     public static final int NO_WAY = 0;
     public static final int CLUSTER_SIZE = 4;
     public static final int MAX_PATH_LENGTH = (CLUSTER_SIZE + CLUSTER_SIZE + 1) * (CLUSTER_SIZE + CLUSTER_SIZE + 1);
-    public static final int STONE_TOTAL_POSITION_IN_CLUSTER = MAX_PATH_LENGTH / 2;
 
     private final Board board;
     private final int myPlayerNumber;
@@ -20,7 +21,7 @@ public class Algorithm {
         this.myPlayerNumber = network.getMyPlayerNumber();
     }
 
-    int[] getNextPath(final int stone) {
+    float[] getNextVector(final int stone) {
         final int[][] fields = board.getFields();
 
         final float[][] stonePosition = board.getStonePosition();
@@ -31,12 +32,12 @@ public class Algorithm {
         final int[][] nodeList = createNodeList(currentPosition);
         final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
-        final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix);
+        final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix, currentPosition, nodeList);
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
         final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0]);
 
-//        final int[] coordinates = getCoordinatesFromPath(bestNode, paths, );
-        return null;
+        final float[] vector = getVectorFromPath(bestPath, nodeList, currentPosition);
+        return vector;
     }
 
     static int[][] createNodeList(final float[] currentPosition) {
@@ -47,12 +48,12 @@ public class Algorithm {
         final int playerPosY = (int) currentPosition[1];
 
         for (int y = playerPosY - CLUSTER_SIZE; y <= playerPosY + CLUSTER_SIZE; y++) {
-            if (y < 0 || y > Board.MAX_Y) {
+            if (y < 0 || y >= Board.MAX_Y) {
                 continue;
             }
 
             for (int x = playerPosX - CLUSTER_SIZE; x <= playerPosX + CLUSTER_SIZE; x++) {
-                if (x < 0 || x > Board.MAX_X) {
+                if (x < 0 || x >= Board.MAX_X) {
                     continue;
                 }
 
@@ -61,6 +62,13 @@ public class Algorithm {
                 currentNodeIndex++;
             }
         }
+
+        if (currentNodeIndex < MAX_PATH_LENGTH) {
+            final int[][] nodeListResized = new int[currentNodeIndex][];
+            System.arraycopy(nodeList, 0, nodeListResized, 0, currentNodeIndex);
+            return nodeListResized;
+        }
+
         return nodeList;
     }
 
@@ -127,24 +135,31 @@ public class Algorithm {
         return toTest >= start && toTest <= stop;
     }
 
-    static int[][] dijkstra(final int[][] adjacencyMatrix) {
-        final int listOfNodesWithPrevious[] = new int[MAX_PATH_LENGTH];
-        final int listOfNodesWithTotalDistance[] = new int[MAX_PATH_LENGTH];
-        final boolean isIncluded[] = new boolean[MAX_PATH_LENGTH];
+    static int[][] dijkstra(final int[][] adjacencyMatrix, float[] currentPosition, int[][] nodeList) {
+        final int listOfNodesWithPrevious[] = new int[adjacencyMatrix.length];
+        final int listOfNodesWithTotalDistance[] = new int[adjacencyMatrix.length];
+        final boolean isIncluded[] = new boolean[adjacencyMatrix.length];
 
-        for (int i = 0; i < MAX_PATH_LENGTH; i++) {
-            listOfNodesWithTotalDistance[i] = Integer.MAX_VALUE;
+        final int playerPosX = (int) currentPosition[0];
+        final int playerPosY = (int) currentPosition[1];
+
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
             listOfNodesWithPrevious[i] = NO_PREVIOUS;
+            final int[] currentNode = nodeList[i];
+            if (currentNode[0] == playerPosX && currentNode[1] == playerPosY) {
+                listOfNodesWithTotalDistance[i] = NO_WAY;
+            } else {
+                listOfNodesWithTotalDistance[i] = Integer.MAX_VALUE;
+
+            }
         }
 
-        listOfNodesWithTotalDistance[STONE_TOTAL_POSITION_IN_CLUSTER] = NO_WAY;
-
-        for (int count = 0; count < MAX_PATH_LENGTH - 1; count++) {
+        for (int count = 0; count < adjacencyMatrix.length - 1; count++) {
             final int u = minDistance(listOfNodesWithTotalDistance, isIncluded);
 
             isIncluded[u] = true;
 
-            for (int v = 0; v < MAX_PATH_LENGTH; v++) {
+            for (int v = 0; v < adjacencyMatrix.length; v++) {
                 final int distanceUV = adjacencyMatrix[u][v];
                 final int currentDistance = listOfNodesWithTotalDistance[u];
                 final int nextNodeDistance = listOfNodesWithTotalDistance[v];
@@ -171,7 +186,7 @@ public class Algorithm {
         int min = Integer.MAX_VALUE;
         int minIndex = -1;
 
-        for (int i = 0; i < MAX_PATH_LENGTH; i++) {
+        for (int i = 0; i < distance.length; i++) {
             if (distance[i] <= min && !isIncluded[i]) {
                 min = distance[i];
                 minIndex = i;
@@ -242,8 +257,16 @@ public class Algorithm {
         return paths[bestNode];
     }
 
-    private int[] getCoordinatesFromPath(int[] shortestPath, float[] startFieldCoordinates, int[][] nodeList) {
-        //TODO: translate to vector
-        return null;
+    static float[] getVectorFromPath(final int[] bestPath, final int[][] nodeList, final float[] currentPosition) {
+        final float CENTER_FIX = 0.5f;
+
+        final int nextNode = bestPath[1];
+        final int[] destination = nodeList[nextNode];
+        final float[] realDestination = new float[]{destination[0] + CENTER_FIX, destination[1] + CENTER_FIX};
+        final float[] vector = new float[]{realDestination[0] - currentPosition[0], realDestination[1] - currentPosition[1]};
+
+        System.out.println(Arrays.toString(vector));
+
+        return vector;
     }
 }

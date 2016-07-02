@@ -13,8 +13,7 @@ public class Algorithm {
     static float[] getNextVector(final Board board, final int stone) {
 
         final int[][] fields = board.getFields();
-        final float[][] stonePosition = board.getStonePosition();
-        float[] currentPosition = stonePosition[stone];
+        final float[] currentPosition = board.getStonePosition(stone);
         final int clusterSize = getClusterSizeForStone(stone);
 
         // NB: nodeList[0] = new int[] {x,y} field coordinates

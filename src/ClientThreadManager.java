@@ -18,9 +18,22 @@ public class ClientThreadManager implements Runnable {
     public void run() {
         final NetworkClient network = new NetworkClient(hostname, Config.TEAM_NAME);
 
+        Board board = new Board(network.getMyPlayerNumber());
+        initBoardWithWall(board, network);
+
         for (int stone = 0; stone < STONE_COUNT; stone++) {
-            final StoneClient target = new StoneClient(stone, network);
+            final StoneClient target = new StoneClient(stone, network, board);
             new Thread(target).start();
+        }
+    }
+
+    private void initBoardWithWall(Board board, NetworkClient network) {
+        for (int y = 0; y < Board.MAX_Y; y++) {
+            for (int x = 0; x < Board.MAX_X; x++) {
+                if (network.isWall(x, y)) {
+                    board.setField(x, y, Board.WALL);
+                }
+            }
         }
     }
 

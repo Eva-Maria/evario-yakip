@@ -10,14 +10,20 @@ import java.util.Random;
 class StoneClient implements Runnable {
     private final int stone;
     private final NetworkClient network;
+    private final Board board;
     private final long seed;
     private final int timeout;
+    private final int myPlayerNumber;
 
     private int lastPreviousPosition = 0;
 
-    StoneClient(final int stone, final NetworkClient network) {
+    StoneClient(final int stone, final NetworkClient network, Board board) {
         this.stone = stone;
         this.network = network;
+        this.board = board;
+
+        this.myPlayerNumber = network.getMyPlayerNumber();
+
         this.seed = Config.CLIENT_SEED;
         this.timeout = getTimeoutForStone(stone);
     }
@@ -36,10 +42,7 @@ class StoneClient implements Runnable {
 
     @Override
     public void run() {
-        Board board = new Board(network.getMyPlayerNumber());
-        initBoardWithWall(board, network);
-
-        final int[][][] previousPositions = new int[ClientThreadManager.STONE_COUNT][ClientThreadManager.PREVIOUS_POSITIONS][];
+        final int[][] previousPositions = new int[ClientThreadManager.PREVIOUS_POSITIONS][];
 
         Random rnd = new Random(seed);
 
@@ -57,7 +60,7 @@ class StoneClient implements Runnable {
             float[] nextVector;
             if (stone == 0 && !board.isSelfColored(stone)) {
                 nextVector = new float[]{0.0f, 0.0f};
-            } else if (hasNotMovedTooLong(previousPositions[stone])) {
+            } else if (hasNotMovedTooLong(previousPositions)) {
                 nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
             } else {
                 nextVector = Algorithm.getNextVector(board, stone);
@@ -93,24 +96,13 @@ class StoneClient implements Runnable {
         return true;
     }
 
-    private void updateBoardWithPlayerPosition(Board board, NetworkClient network, int[][][] previousPositions) {
-        int myPlayerNumber = network.getMyPlayerNumber();
-        for (int stone = 0; stone < ClientThreadManager.STONE_COUNT; stone++) {
-            float x = network.getX(myPlayerNumber, stone);
-            float y = network.getY(myPlayerNumber, stone);
-            board.setStonePosition(stone, x, y);
-            previousPositions[stone][lastPreviousPosition] = new int[]{(int) x, (int) y};
-        }
+    private void updateBoardWithPlayerPosition(Board board, NetworkClient network, int[][] previousPositions) {
+        float x = network.getX(myPlayerNumber, stone);
+        float y = network.getY(myPlayerNumber, stone);
+        board.setStonePosition(stone, x, y);
+        previousPositions[lastPreviousPosition] = new int[]{(int) x, (int) y};
 
         lastPreviousPosition = (lastPreviousPosition + 1) % ClientThreadManager.PREVIOUS_POSITIONS;
-    }
-
-    private void wait(int timeout) {
-        try {
-            Thread.sleep(timeout);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void updateBoardWithColors(Board board, NetworkClient network) {
@@ -120,13 +112,11 @@ class StoneClient implements Runnable {
         }
     }
 
-    private void initBoardWithWall(Board board, NetworkClient network) {
-        for (int y = 0; y < Board.MAX_Y; y++) {
-            for (int x = 0; x < Board.MAX_X; x++) {
-                if (network.isWall(x, y)) {
-                    board.setField(x, y, Board.WALL);
-                }
-            }
+    private void wait(int timeout) {
+        try {
+            Thread.sleep(timeout);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

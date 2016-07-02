@@ -23,24 +23,9 @@ public class Algorithm {
     float[] getNextVector(final int stone) {
 
         final int[][] fields = board.getFields();
-
         final float[][] stonePosition = board.getStonePosition();
-
         float[] currentPosition = stonePosition[stone];
-
-        int clusterSize;
-        switch (stone) {
-            case 0:
-                clusterSize = 10;
-                break;
-            case 1:
-                clusterSize = 5;
-                break;
-            default:
-            case 2:
-                clusterSize = 3;
-                break;
-        }
+        final int clusterSize = getClusterSizeForStone(stone);
 
         // NB: nodeList[0] = new int[] {x,y} field coordinates
         final int[][] nodeList = createNodeList(currentPosition, clusterSize);
@@ -63,7 +48,24 @@ public class Algorithm {
         return vector;
     }
 
-    private int[][] mapNodesToFields(int[][] nodeList, int[] nodes) {
+    static int getClusterSizeForStone(int stone) {
+        int clusterSize;
+        switch (stone) {
+            case 0:
+                clusterSize = 10;
+                break;
+            case 1:
+                clusterSize = 5;
+                break;
+            default:
+            case 2:
+                clusterSize = 3;
+                break;
+        }
+        return clusterSize;
+    }
+
+    static int[][] mapNodesToFields(int[][] nodeList, int[] nodes) {
         final int[][] fields = new int[nodes.length][];
         for (int i = 0; i < nodes.length; i++) {
             final int node = nodes[i];

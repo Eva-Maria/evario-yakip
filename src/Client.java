@@ -11,6 +11,7 @@ public class Client implements Runnable {
 
     public static final int STONE_COUNT = 3;
     public static final int PREVIOUS_POSITIONS = 3;
+    public static final int TIMEOUT = 500;
 
     private final String hostname;
     private final long seed;
@@ -38,6 +39,7 @@ public class Client implements Runnable {
 
         while (network.isAlive()) {
             for (int stone = 0; stone < STONE_COUNT; ++stone) {
+                final long start = System.currentTimeMillis();
 
                 updateBoardWithPlayerPosition(board, network, previousPositions);
                 updateBoardWithColors(board, network);
@@ -50,16 +52,21 @@ public class Client implements Runnable {
                         nextVector = algorithm.getNextVector(stone);
                     }
                     network.setMoveDirection(stone, nextVector[0], nextVector[1]);
-                    wait(500);
+
+                    final int diff = (int) (System.currentTimeMillis() - start);
+                    final int timeout = TIMEOUT - diff;
+                    if (timeout > 0) {
+                        wait(timeout);
+                    }
                 } else {
-                    moveOpponentRandom(network, rnd, stone);
+                    moveRandom(network, rnd, stone);
                 }
             }
         }
 
     }
 
-    private void moveOpponentRandom(NetworkClient network, Random rnd, int stone) {
+    private void moveRandom(NetworkClient network, Random rnd, int stone) {
         if (stone == 0 && rnd.nextBoolean()) {
             network.setMoveDirection(stone, 0.0f, 0.0f);
         } else {

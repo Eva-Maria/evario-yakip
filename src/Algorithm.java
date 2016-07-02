@@ -34,10 +34,28 @@ public class Algorithm {
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
         final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix, currentPosition, nodeList);
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
-        final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0]);
+        final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0], stone);
+
+        final int[][] pathFields = mapNodesToFields(nodeList, bestPath);
+        System.out.println(board.toString(pathFields));
+
+        System.out.println("best path: " + Arrays.toString(bestPath));
+        System.out.print("best path as coordinates: ");
+        Arrays.stream(pathFields).forEach(ints -> System.out.print(Arrays.toString(ints) + ", "));
+        System.out.println();
 
         final float[] vector = getVectorFromPath(bestPath, nodeList, currentPosition);
+        System.out.println(stone + ": " + Arrays.toString(vector));
         return vector;
+    }
+
+    private int[][] mapNodesToFields(int[][] nodeList, int[] nodes) {
+        final int[][] fields = new int[nodes.length][];
+        for (int i = 0; i < nodes.length; i++) {
+            final int node = nodes[i];
+            fields[i] = nodeList[node];
+        }
+        return fields;
     }
 
     static int[][] createNodeList(final float[] currentPosition) {
@@ -84,9 +102,9 @@ public class Algorithm {
             if (field == Board.WALL) {
                 weight = NO_WAY;
             } else if (field == Board.EMPTY) {
-                weight = 2;
+                weight = 3;
             } else if (field == myPlayerNumber) {
-                weight = 3; // our color
+                weight = 5; // our color
             } else {
                 weight = 1; // opponent color field
             }
@@ -230,8 +248,9 @@ public class Algorithm {
         return c;
     }
 
-    static int[] calcBestPathFromPathsAndDistances(final int[][] paths, final int[] distances) {
+    static int[] calcBestPathFromPathsAndDistances(final int[][] paths, final int[] distances, int stone) {
         int lowestScore = Integer.MAX_VALUE;
+        int lowestDistance = Integer.MAX_VALUE;
         int longestPath = 0;
 
         int bestNode = -1;
@@ -246,11 +265,26 @@ public class Algorithm {
             // NB: score  - the lower the better!
             final int score = (int) (distance * 100f / pathLength);
 
+//            if (stone == 0){
+//                if (lowestDistance > distance && longestPath < pathLength) {
+//                    longestPath = pathLength;
+//                    lowestDistance = distance;
+//                    bestNode = node;
+//                }
+//            }else if(stone == 1){
             if (lowestScore > score && longestPath < pathLength) {
                 longestPath = pathLength;
                 lowestScore = score;
                 bestNode = node;
             }
+//            }else{
+//                if (lowestScore > score) {
+//                    lowestScore = score;
+//                    bestNode = node;
+//                }
+//            }
+
+
         }
 
 //        System.out.println("Best node is number " + bestNode + " with score " + lowestScore);
@@ -258,14 +292,16 @@ public class Algorithm {
     }
 
     static float[] getVectorFromPath(final int[] bestPath, final int[][] nodeList, final float[] currentPosition) {
-        final float CENTER_FIX = 0.5f;
+        final float CENTER_FIX = (float) Math.random();
 
         final int nextNode = bestPath[1];
         final int[] destination = nodeList[nextNode];
-        final float[] realDestination = new float[]{destination[0] + CENTER_FIX, destination[1] + CENTER_FIX};
-        final float[] vector = new float[]{realDestination[0] - currentPosition[0], realDestination[1] - currentPosition[1]};
 
-        System.out.println(Arrays.toString(vector));
+        final float[] realDestination = new float[]{destination[0] + CENTER_FIX, destination[1] + CENTER_FIX};
+
+        System.out.println("From " + Arrays.toString(currentPosition) + ", to: " + Arrays.toString(realDestination));
+
+        final float[] vector = new float[]{realDestination[0] - currentPosition[0], realDestination[1] - currentPosition[1]};
 
         return vector;
     }

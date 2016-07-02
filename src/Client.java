@@ -39,7 +39,6 @@ public class Client implements Runnable {
                         final float[] nextVector = algorithm.getNextVector(stone);
 
                         network.setMoveDirection(stone, nextVector[0], nextVector[1]);
-                        wait(500);
                     } else {
                         network.setMoveDirection(stone, 1, 1);
                         wait(500);

@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 /**
  * Created by eve on 6/13/16.
  */
@@ -66,22 +64,13 @@ public class Board {
 
     @Override
     public String toString() {
-        return toString(new int[0], new int[0][]);
+        return toString(new int[0][]);
     }
 
-
-    public String toString(final int[] distances, int[][] nodeList) {
-        final int[][] shortestPathFieldCoordinates = new int[distances.length][];
-
-        System.out.println(Arrays.toString(distances));
-        for (int i = 0; i < distances.length; i++) {
-            final int[] currentFieldCoordinates = nodeList[i];
-            shortestPathFieldCoordinates[i] = currentFieldCoordinates;
-        }
-
+    public String toString(final int[][] path) {
         StringBuilder builder = new StringBuilder();
-        for (int y = 0; y < Board.MAX_Y; y++) {
-//        for (int y = Board.MAX_Y - 1; y >= 0; y--) {
+//        for (int y = 0; y < Board.MAX_Y; y++) {
+        for (int y = Board.MAX_Y - 1; y >= 0; y--) {
             for (int x = 0; x < Board.MAX_X; x++) {
                 int field = fields[y][x];
 
@@ -120,17 +109,12 @@ public class Board {
                 //////////
 
                 boolean hasDistance = false;
-                for (int i = 0; i < shortestPathFieldCoordinates.length; i++) {
-                    int[] shortestPathFieldCoordinate = shortestPathFieldCoordinates[i];
+                for (int i = 0; i < path.length; i++) {
+                    int[] shortestPathFieldCoordinate = path[i];
                     final int spX = shortestPathFieldCoordinate[0];
                     final int spY = shortestPathFieldCoordinate[1];
                     if (spX == x && spY == y) {
-                        final int distance = distances[i];
-                        if (distance > 9) {
-                            builder.append("?");
-                        } else {
-                            builder.append(distance);
-                        }
+                        builder.append("~");
                         hasDistance = true;
                         break;
                     }

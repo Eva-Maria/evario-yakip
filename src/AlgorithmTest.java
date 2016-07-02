@@ -34,7 +34,7 @@ public class AlgorithmTest extends TestCase {
 
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
 
-        final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0]);
+        final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0], 1);
 
         final long stop = System.nanoTime();
         final long diff = stop - start;

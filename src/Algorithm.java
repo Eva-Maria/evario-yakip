@@ -9,8 +9,6 @@ import java.util.Random;
 public class Algorithm {
     public static final int NO_PREVIOUS = -1;
     public static final int NO_WAY = 0;
-    public static final int CLUSTER_SIZE = 4;
-    public static final int MAX_PATH_LENGTH = (CLUSTER_SIZE + CLUSTER_SIZE + 1) * (CLUSTER_SIZE + CLUSTER_SIZE + 1);
 
     private static final Random rnd = new Random(100);
 
@@ -23,14 +21,29 @@ public class Algorithm {
     }
 
     float[] getNextVector(final int stone) {
+
         final int[][] fields = board.getFields();
 
         final float[][] stonePosition = board.getStonePosition();
 
         float[] currentPosition = stonePosition[stone];
 
+        int clusterSize;
+        switch (stone) {
+            case 0:
+                clusterSize = 10;
+                break;
+            case 1:
+                clusterSize = 5;
+                break;
+            default:
+            case 2:
+                clusterSize = 3;
+                break;
+        }
+
         // NB: nodeList[0] = new int[] {x,y} field coordinates
-        final int[][] nodeList = createNodeList(currentPosition);
+        final int[][] nodeList = createNodeList(currentPosition, clusterSize);
         final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
         final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix, currentPosition, nodeList);
@@ -59,19 +72,21 @@ public class Algorithm {
         return fields;
     }
 
-    static int[][] createNodeList(final float[] currentPosition) {
-        final int[][] nodeList = new int[MAX_PATH_LENGTH][];
+    static int[][] createNodeList(final float[] currentPosition, final int clusterSize) {
+        int maxPathLength = (clusterSize + clusterSize + 1) * (clusterSize + clusterSize + 1);
+
+        final int[][] nodeList = new int[maxPathLength][];
         int currentNodeIndex = 0;
 
         final int playerPosX = (int) currentPosition[0];
         final int playerPosY = (int) currentPosition[1];
 
-        for (int y = playerPosY - CLUSTER_SIZE; y <= playerPosY + CLUSTER_SIZE; y++) {
+        for (int y = playerPosY - clusterSize; y <= playerPosY + clusterSize; y++) {
             if (y < 0 || y >= Board.MAX_Y) {
                 continue;
             }
 
-            for (int x = playerPosX - CLUSTER_SIZE; x <= playerPosX + CLUSTER_SIZE; x++) {
+            for (int x = playerPosX - clusterSize; x <= playerPosX + clusterSize; x++) {
                 if (x < 0 || x >= Board.MAX_X) {
                     continue;
                 }
@@ -82,7 +97,7 @@ public class Algorithm {
             }
         }
 
-        if (currentNodeIndex < MAX_PATH_LENGTH) {
+        if (currentNodeIndex < maxPathLength) {
             final int[][] nodeListResized = new int[currentNodeIndex][];
             System.arraycopy(nodeList, 0, nodeListResized, 0, currentNodeIndex);
             return nodeListResized;
@@ -251,7 +266,6 @@ public class Algorithm {
 
     static int[] calcBestPathFromPathsAndDistances(final int[][] paths, final int[] distances, int stone) {
         int lowestScore = Integer.MAX_VALUE;
-        int lowestDistance = Integer.MAX_VALUE;
         int longestPath = 0;
 
         int bestNode = -1;
@@ -266,29 +280,13 @@ public class Algorithm {
             // NB: score  - the lower the better!
             final int score = (int) (distance * 100f / pathLength);
 
-//            if (stone == 0){
-//                if (lowestDistance > distance && longestPath < pathLength) {
-//                    longestPath = pathLength;
-//                    lowestDistance = distance;
-//                    bestNode = node;
-//                }
-//            }else if(stone == 1){
             if (lowestScore > score && longestPath < pathLength) {
                 longestPath = pathLength;
                 lowestScore = score;
                 bestNode = node;
             }
-//            }else{
-//                if (lowestScore > score) {
-//                    lowestScore = score;
-//                    bestNode = node;
-//                }
-//            }
-
-
         }
 
-//        System.out.println("Best node is number " + bestNode + " with score " + lowestScore);
         return paths[bestNode];
     }
 
@@ -297,13 +295,11 @@ public class Algorithm {
 
         final int nextNode = bestPath[1];
         final int[] destination = nodeList[nextNode];
-
         final float[] realDestination = new float[]{destination[0] + CENTER_FIX, destination[1] + CENTER_FIX};
 
         System.out.println("From " + Arrays.toString(currentPosition) + ", to: " + Arrays.toString(realDestination));
 
         final float[] vector = new float[]{realDestination[0] - currentPosition[0], realDestination[1] - currentPosition[1]};
-
         return vector;
     }
 }

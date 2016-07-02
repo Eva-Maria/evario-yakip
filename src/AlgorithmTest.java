@@ -25,7 +25,7 @@ public class AlgorithmTest extends TestCase {
 
     public void testName() throws Exception {
         final long start = System.nanoTime();
-        final int[][] nodeList = Algorithm.createNodeList(CURRENT_POSITION);
+        final int[][] nodeList = Algorithm.createNodeList(CURRENT_POSITION, 4);
 //         printMatrix(nodeList);
         final int[][] adjacencyMatrix = Algorithm.createAdjacencyMatrix(nodeList, WEIGHT_MATRIX);
 //        printMatrix(adjacencyMatrix);

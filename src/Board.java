@@ -21,6 +21,8 @@ public class Board {
     private final int myPlayerNumber; // 0..3 players
 
     private int fields[][] = new int[MAX_Y][MAX_X]; // 0..31 by 0..31 field coordinates
+    private int heatMap[][] = new int[MAX_Y][MAX_X]; // 0..31 by 0..31 field coordinates
+
     private float[][] stonePosition = new float[3][]; // 0..2 stones by 0..31 field coordinates
     private int playerPoints[] = new int[4]; // 0..3 players by points
 
@@ -46,6 +48,10 @@ public class Board {
         stonePosition[stoneNumber] = new float[]{x, y};
     }
 
+    public int[][] getHeatMap() {
+        return heatMap;
+    }
+
     void setField(int x, int y, int value) {
         synchronized (fields) {
 //            if (x == 0 && y == 0 && value == 0) {
@@ -62,6 +68,9 @@ public class Board {
             }
 
             fields[y][x] = value;
+            if (value == myPlayerNumber) {
+                heatMap[y][x] = heatMap[y][x] + 1;
+            }
         }
     }
 

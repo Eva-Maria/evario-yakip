@@ -87,7 +87,7 @@ class StoneClient implements Runnable {
         } else {
             network.setMoveDirection(stone, rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f);
         }
-        wait(2000);
+        wait(100);
     }
 
     private boolean hasNotMovedTooLong(int[][] previousPosition) {

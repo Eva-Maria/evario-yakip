@@ -13,12 +13,13 @@ public class Algorithm {
     static float[] getNextVector(final Board board, final int stone) {
 
         final int[][] fields = board.getFields();
+        final int[][] heatMap = board.getHeatMap();
         final float[] currentPosition = board.getStonePosition(stone);
         final int clusterSize = getClusterSizeForStone(stone);
 
         // NB: nodeList[0] = new int[] {x,y} field coordinates
         final int[][] nodeList = createNodeList(currentPosition, clusterSize);
-        final int[][] weightMatrix = createWeightMatrix(nodeList, fields, board.getPlayerNumber());
+        final int[][] weightMatrix = createWeightMatrix(nodeList, fields, heatMap, board.getPlayerNumber());
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
         final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix, currentPosition, nodeList);
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
@@ -26,7 +27,7 @@ public class Algorithm {
         final int[][] pathFields = mapNodesToFields(nodeList, bestPath);
         final float[] vector = getVectorFromPath(bestPath, nodeList, currentPosition);
 
-        if (stone == 1) {
+        if (stone == 2) {
             System.out.println(board.toString(pathFields));
             System.out.println(stone + ": " + Arrays.toString(vector));
         }
@@ -36,12 +37,12 @@ public class Algorithm {
     static int getClusterSizeForStone(final int stone) {
         switch (stone) {
             case 0:
-                return 6;
+                return 5;
             case 1:
-                return 4;
+                return 5;
             default:
             case 2:
-                return 3;
+                return 5;
         }
     }
 
@@ -79,7 +80,7 @@ public class Algorithm {
         return nodeList;
     }
 
-    static int[][] createWeightMatrix(final int[][] nodeList, final int[][] fields, int myPlayerNumber) {
+    static int[][] createWeightMatrix(final int[][] nodeList, final int[][] fields, int[][] heatMap, int myPlayerNumber) {
         final int distanceMatrix[][] = new int[Board.MAX_Y][Board.MAX_X];
 
         for (final int[] fieldCoordinates : nodeList) {
@@ -87,13 +88,14 @@ public class Algorithm {
             final int y = fieldCoordinates[1];
 
             final int field = fields[y][x];
+            final int heat = heatMap[y][x];
             int weight;
             if (field == Board.WALL) {
                 weight = NO_WAY;
             } else if (field == Board.EMPTY) {
                 weight = 3;
             } else if (field == myPlayerNumber) {
-                weight = 5; // our color
+                weight = 5 + heat; // our color
             } else {
                 weight = 1; // opponent color field
             }

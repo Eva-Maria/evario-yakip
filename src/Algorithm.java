@@ -34,44 +34,26 @@ public class Algorithm {
         final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix, currentPosition, nodeList);
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
         final int[] bestPath = Algorithm.calcBestPathFromPathsAndDistances(paths, distancesAndPrevious[0], stone);
-
         final int[][] pathFields = mapNodesToFields(nodeList, bestPath);
-        System.out.println(board.toString(pathFields));
-
-        System.out.println("best path: " + Arrays.toString(bestPath));
-        System.out.print("best path as coordinates: ");
-        Arrays.stream(pathFields).forEach(ints -> System.out.print(Arrays.toString(ints) + ", "));
-        System.out.println();
-
         final float[] vector = getVectorFromPath(bestPath, nodeList, currentPosition);
-        System.out.println(stone + ": " + Arrays.toString(vector));
+
+        if (stone == 1) {
+            System.out.println(board.toString(pathFields));
+            System.out.println(stone + ": " + Arrays.toString(vector));
+        }
         return vector;
     }
 
     static int getClusterSizeForStone(int stone) {
-        int clusterSize;
         switch (stone) {
             case 0:
-                clusterSize = 10;
-                break;
+                return 6;
             case 1:
-                clusterSize = 5;
-                break;
+                return 4;
             default:
             case 2:
-                clusterSize = 3;
-                break;
+                return 3;
         }
-        return clusterSize;
-    }
-
-    static int[][] mapNodesToFields(int[][] nodeList, int[] nodes) {
-        final int[][] fields = new int[nodes.length][];
-        for (int i = 0; i < nodes.length; i++) {
-            final int node = nodes[i];
-            fields[i] = nodeList[node];
-        }
-        return fields;
     }
 
     static int[][] createNodeList(final float[] currentPosition, final int clusterSize) {
@@ -290,6 +272,15 @@ public class Algorithm {
         }
 
         return paths[bestNode];
+    }
+
+    static int[][] mapNodesToFields(int[][] nodeList, int[] nodes) {
+        final int[][] fields = new int[nodes.length][];
+        for (int i = 0; i < nodes.length; i++) {
+            final int node = nodes[i];
+            fields[i] = nodeList[node];
+        }
+        return fields;
     }
 
     static float[] getVectorFromPath(final int[] bestPath, final int[][] nodeList, final float[] currentPosition) {

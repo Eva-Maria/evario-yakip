@@ -23,8 +23,6 @@ public class Launcher {
     public static void main(String... args) throws IOException {
         String hostName = Config.HOSTNAME;
         long seed = Config.CLIENT_SEED;
-//        wrapSystemOut();
-
         if (args.length >= 1) {
             hostName = args[0];
         }
@@ -32,24 +30,24 @@ public class Launcher {
             if (args[1].equals(MODE_AUTO)) {
                 new Thread(serverLauncher).start();
                 waitForServer();
-                new Client(hostName, seed);
-                new Client(hostName, seed);
-                new Client(hostName, seed);
+                new ClientThreadManager(hostName, seed);
+                new ClientThreadManager(hostName, seed);
+                new ClientThreadManager(hostName, seed);
                 return;
             }
 
             if (args[1].equals(MODE_FULLAUTO)) {
                 new Thread(serverLauncher).start();
                 waitForServer();
-                new Client(hostName, seed);
-                new Client(hostName, seed);
-                new Client(hostName, seed);
-                new Client(hostName, seed);
+                new ClientThreadManager(hostName, seed);
+                new ClientThreadManager(hostName, seed);
+                new ClientThreadManager(hostName, seed);
+                new ClientThreadManager(hostName, seed);
                 return;
             }
         }
 
-        new Client(hostName, seed);
+        new ClientThreadManager(hostName, seed);
     }
 
     private static void waitForServer() {

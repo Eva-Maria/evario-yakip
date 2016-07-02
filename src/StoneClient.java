@@ -5,65 +5,70 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Created by eve on 5/30/16.
+ * Created by m on 7/2/16.
  */
-public class Client implements Runnable {
-
-    public static final int STONE_COUNT = 3;
-    public static final int PREVIOUS_POSITIONS = 3;
-    public static final int TIMEOUT = 500;
-
-    private final String hostname;
+class StoneClient implements Runnable {
+    private final int stone;
+    private final NetworkClient network;
     private final long seed;
+    private final int timeout;
 
     private int lastPreviousPosition = 0;
 
-    public Client(String hostname, long seed) {
-        this.hostname = hostname;
+    StoneClient(final int stone, final NetworkClient network, final long seed) {
+        this.stone = stone;
+        this.network = network;
         this.seed = seed;
+        this.timeout = getTimeoutForStone(stone);
+    }
 
-        Thread thread = new Thread(this);
-        thread.start();
+    static int getTimeoutForStone(int stone) {
+        switch (stone) {
+            case 0:
+                return 350;
+            case 1:
+                return 750;
+            default:
+            case 2:
+                return 1100;
+        }
     }
 
     @Override
     public void run() {
-        NetworkClient network = new NetworkClient(hostname, Config.TEAM_NAME);
         Board board = new Board(network.getMyPlayerNumber());
         initBoardWithWall(board, network);
         Algorithm algorithm = new Algorithm(board, network);
 
-        final int[][][] previousPositions = new int[STONE_COUNT][PREVIOUS_POSITIONS][];
+        final int[][][] previousPositions = new int[ClientThreadManager.STONE_COUNT][ClientThreadManager.PREVIOUS_POSITIONS][];
 
         Random rnd = new Random(seed);
 
         while (network.isAlive()) {
-            for (int stone = 0; stone < STONE_COUNT; ++stone) {
-                final long start = System.currentTimeMillis();
+            if (network.getMyPlayerNumber() != 0) {
+                moveRandom(network, rnd, stone);
+                continue;
+            }
 
-                updateBoardWithPlayerPosition(board, network, previousPositions);
-                updateBoardWithColors(board, network);
+            final long start = System.currentTimeMillis();
 
-                if (network.getMyPlayerNumber() == 0) {
-                    float[] nextVector;
-                    if (hasNotMovedTooLong(previousPositions[stone])) {
-                        nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
-                    } else {
-                        nextVector = algorithm.getNextVector(stone);
-                    }
-                    network.setMoveDirection(stone, nextVector[0], nextVector[1]);
+            updateBoardWithPlayerPosition(board, network, previousPositions);
+            updateBoardWithColors(board, network);
 
-                    final int diff = (int) (System.currentTimeMillis() - start);
-                    final int timeout = TIMEOUT - diff;
-                    if (timeout > 0) {
-                        wait(timeout);
-                    }
-                } else {
-                    moveRandom(network, rnd, stone);
-                }
+            float[] nextVector;
+            if (hasNotMovedTooLong(previousPositions[stone])) {
+                nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
+            } else {
+                nextVector = algorithm.getNextVector(stone);
+            }
+            network.setMoveDirection(stone, nextVector[0], nextVector[1]);
+
+            final int diff = (int) (System.currentTimeMillis() - start);
+            final int timeoutLeft = timeout - diff;
+            if (timeoutLeft > 0) {
+                wait(timeoutLeft);
             }
         }
-
     }
 
     private void moveRandom(NetworkClient network, Random rnd, int stone) {
@@ -89,14 +94,14 @@ public class Client implements Runnable {
 
     private void updateBoardWithPlayerPosition(Board board, NetworkClient network, int[][][] previousPositions) {
         int myPlayerNumber = network.getMyPlayerNumber();
-        for (int stone = 0; stone < STONE_COUNT; stone++) {
+        for (int stone = 0; stone < ClientThreadManager.STONE_COUNT; stone++) {
             float x = network.getX(myPlayerNumber, stone);
             float y = network.getY(myPlayerNumber, stone);
             board.setStonePosition(stone, x, y);
             previousPositions[stone][lastPreviousPosition] = new int[]{(int) x, (int) y};
         }
 
-        lastPreviousPosition = (lastPreviousPosition + 1) % PREVIOUS_POSITIONS;
+        lastPreviousPosition = (lastPreviousPosition + 1) % ClientThreadManager.PREVIOUS_POSITIONS;
     }
 
     private void wait(int timeout) {

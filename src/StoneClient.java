@@ -15,10 +15,10 @@ class StoneClient implements Runnable {
 
     private int lastPreviousPosition = 0;
 
-    StoneClient(final int stone, final NetworkClient network, final long seed) {
+    StoneClient(final int stone, final NetworkClient network) {
         this.stone = stone;
         this.network = network;
-        this.seed = seed;
+        this.seed = Config.CLIENT_SEED;
         this.timeout = getTimeoutForStone(stone);
     }
 

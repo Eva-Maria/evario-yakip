@@ -44,7 +44,7 @@ public class Algorithm {
         return vector;
     }
 
-    static int getClusterSizeForStone(int stone) {
+    static int getClusterSizeForStone(final int stone) {
         switch (stone) {
             case 0:
                 return 6;

@@ -18,7 +18,7 @@ public class Algorithm {
 
         // NB: nodeList[0] = new int[] {x,y} field coordinates
         final int[][] nodeList = createNodeList(currentPosition, clusterSize);
-        final int[][] weightMatrix = createWeightMatrix(nodeList, fields, board.myPlayerNumber);
+        final int[][] weightMatrix = createWeightMatrix(nodeList, fields, board.getPlayerNumber());
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
         final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix, currentPosition, nodeList);
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);

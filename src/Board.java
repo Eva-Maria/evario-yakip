@@ -18,7 +18,7 @@ public class Board {
             (char) 27 + "[32m", // green
     };
 
-    final int myPlayerNumber; // 0..3 players
+    private final int myPlayerNumber; // 0..3 players
 
     private int fields[][] = new int[MAX_Y][MAX_X]; // 0..31 by 0..31 field coordinates
     private float[][] stonePosition = new float[3][]; // 0..2 stones by 0..31 field coordinates
@@ -61,7 +61,6 @@ public class Board {
                 }
             }
 
-//        System.out.println("x: " + x + " y: " + y + ", value: " + value);
             fields[y][x] = value;
         }
     }
@@ -69,6 +68,10 @@ public class Board {
     boolean isSelfColored(int stone) {
         final float[] stonePosition = this.stonePosition[stone];
         return fields[(int) stonePosition[1]][(int) stonePosition[0]] == myPlayerNumber;
+    }
+
+    public int getPlayerNumber() {
+        return myPlayerNumber;
     }
 
     @Override
@@ -80,7 +83,7 @@ public class Board {
         StringBuilder builder = new StringBuilder();
 
         try {
-//        for (int y = 0; y < Board.MAX_Y; y++) {
+//            for (int y = 0; y < Board.MAX_Y; y++) {
             for (int y = Board.MAX_Y - 1; y >= 0; y--) {
                 for (int x = 0; x < Board.MAX_X; x++) {
                     int field = fields[y][x];
@@ -98,7 +101,7 @@ public class Board {
 
                     //////////
 
-                    boolean hasStone = false;
+                    String stoneOutput = null;
 
                     for (int stone = 0; stone < 3; stone++) {
                         float[] position = stonePosition[stone];
@@ -106,37 +109,36 @@ public class Board {
                         int playerPosY = (int) position[1];
 
                         if (playerPosX == x && playerPosY == y) {
-                            hasStone = true;
                             String playerOutputColor = PLAYER_OUTPUT_COLORS[myPlayerNumber];
-                            builder.append(playerOutputColor).append(stone).append(RESET_OUTPUT_COLOR);
+                            stoneOutput = playerOutputColor + stone;
                             break;
                         }
                     }
 
-                    if (!hasStone) {
-                        builder.append(" ");
-                    }
-
                     //////////
 
-                    boolean hasDistance = false;
+                    boolean isInPath = false;
                     for (int i = 0; i < path.length; i++) {
                         int[] shortestPathFieldCoordinate = path[i];
                         final int spX = shortestPathFieldCoordinate[0];
                         final int spY = shortestPathFieldCoordinate[1];
                         if (spX == x && spY == y) {
-                            builder.append("~");
-                            hasDistance = true;
+                            isInPath = true;
                             break;
                         }
                     }
 
-                    if (!hasDistance) {
-                        builder.append(" ");
-                    }
-
                     //////////
 
+                    if (isInPath) {
+                        builder.append(UNDERLINE_OUTPUT_COLOR);
+                    }
+                    if (stoneOutput != null) {
+                        builder.append(stoneOutput);
+                    } else {
+                        builder.append(" ");
+                    }
+                    builder.append(RESET_OUTPUT_COLOR);
                 }
                 builder.append("\n");
             }

@@ -56,7 +56,9 @@ class StoneClient implements Runnable {
             updateBoardWithColors(board, network);
 
             float[] nextVector;
-            if (hasNotMovedTooLong(previousPositions[stone])) {
+            if (stone == 0 && !board.isSelfColored(stone)) {
+                nextVector = new float[]{0.0f, 0.0f};
+            } else if (hasNotMovedTooLong(previousPositions[stone])) {
                 nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
             } else {
                 nextVector = algorithm.getNextVector(stone);

@@ -23,7 +23,7 @@ public class Board {
     private float[][] stonePosition = new float[3][]; // 0..2 stones by 0..31 field coordinates
     private int playerPoints[] = new int[4]; // 0..3 players by points
 
-    public Board(int myPlayerNumber) {
+    Board(int myPlayerNumber) {
         this.myPlayerNumber = myPlayerNumber;
         for (int y = 0; y < Board.MAX_Y; y++) {
             for (int x = 0; x < Board.MAX_X; x++) {
@@ -32,19 +32,19 @@ public class Board {
         }
     }
 
-    public int[][] getFields() {
+    int[][] getFields() {
         return fields;
     }
 
-    public float[][] getStonePosition() {
+    float[][] getStonePosition() {
         return stonePosition;
     }
 
-    public void setStonePosition(int stoneNumber, float x, float y) {
+    void setStonePosition(int stoneNumber, float x, float y) {
         stonePosition[stoneNumber] = new float[]{x, y};
     }
 
-    public void setField(int x, int y, int value) {
+    void setField(int x, int y, int value) {
         if (x == 0 && y == 0 && value == 0) {
             return;
         }
@@ -60,6 +60,11 @@ public class Board {
 
 //        System.out.println("x: " + x + " y: " + y + ", value: " + value);
         fields[y][x] = value;
+    }
+
+    boolean isSelfColored(int stone) {
+        final float[] stonePosition = this.stonePosition[stone];
+        return fields[(int) stonePosition[1]][(int) stonePosition[0]] == myPlayerNumber;
     }
 
     @Override

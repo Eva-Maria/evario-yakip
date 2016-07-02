@@ -54,18 +54,24 @@ class StoneClient implements Runnable {
 
             final long start = System.currentTimeMillis();
 
-            updateBoardWithPlayerPosition(board, network, previousPositions);
-            updateBoardWithColors(board, network);
+            try {
+                updateBoardWithPlayerPosition(board, network, previousPositions);
+                updateBoardWithColors(board, network);
 
-            float[] nextVector;
-            if (stone == 0 && !board.isSelfColored(stone)) {
-                nextVector = new float[]{0.0f, 0.0f};
-            } else if (hasNotMovedTooLong(previousPositions)) {
-                nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
-            } else {
-                nextVector = Algorithm.getNextVector(board, stone);
+                float[] nextVector;
+                if (stone == 0 && !board.isSelfColored(stone)) {
+                    nextVector = new float[]{0.0f, 0.0f};
+                } else if (hasNotMovedTooLong(previousPositions)) {
+                    nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
+                } else {
+                    nextVector = Algorithm.getNextVector(board, stone);
+                }
+                network.setMoveDirection(stone, nextVector[0], nextVector[1]);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Exception caught. We do NOT stop on exception like other students!");
             }
-            network.setMoveDirection(stone, nextVector[0], nextVector[1]);
 
             final int diff = (int) (System.currentTimeMillis() - start);
             final int timeoutLeft = timeout - diff;

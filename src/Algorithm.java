@@ -1,5 +1,3 @@
-import lenz.htw.yakip.net.NetworkClient;
-
 import java.util.Arrays;
 import java.util.Random;
 
@@ -12,15 +10,7 @@ public class Algorithm {
 
     private static final Random rnd = new Random(100);
 
-    private final Board board;
-    private final int myPlayerNumber;
-
-    public Algorithm(Board board, NetworkClient network) {
-        this.board = board;
-        this.myPlayerNumber = network.getMyPlayerNumber();
-    }
-
-    float[] getNextVector(final int stone) {
+    static float[] getNextVector(final Board board, final int stone) {
 
         final int[][] fields = board.getFields();
         final float[][] stonePosition = board.getStonePosition();
@@ -29,7 +19,7 @@ public class Algorithm {
 
         // NB: nodeList[0] = new int[] {x,y} field coordinates
         final int[][] nodeList = createNodeList(currentPosition, clusterSize);
-        final int[][] weightMatrix = createWeightMatrix(nodeList, fields);
+        final int[][] weightMatrix = createWeightMatrix(nodeList, fields, board.myPlayerNumber);
         final int[][] adjacencyMatrix = createAdjacencyMatrix(nodeList, weightMatrix);
         final int[][] distancesAndPrevious = dijkstra(adjacencyMatrix, currentPosition, nodeList);
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
@@ -90,7 +80,7 @@ public class Algorithm {
         return nodeList;
     }
 
-    int[][] createWeightMatrix(final int[][] nodeList, final int[][] fields) {
+    static int[][] createWeightMatrix(final int[][] nodeList, final int[][] fields, int myPlayerNumber) {
         final int distanceMatrix[][] = new int[Board.MAX_Y][Board.MAX_X];
 
         for (final int[] fieldCoordinates : nodeList) {

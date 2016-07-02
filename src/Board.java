@@ -18,7 +18,8 @@ public class Board {
             (char) 27 + "[32m", // green
     };
 
-    private final int myPlayerNumber; // 0..3 players
+    final int myPlayerNumber; // 0..3 players
+
     private int fields[][] = new int[MAX_Y][MAX_X]; // 0..31 by 0..31 field coordinates
     private float[][] stonePosition = new float[3][]; // 0..2 stones by 0..31 field coordinates
     private int playerPoints[] = new int[4]; // 0..3 players by points

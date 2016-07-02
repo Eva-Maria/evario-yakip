@@ -38,7 +38,6 @@ class StoneClient implements Runnable {
     public void run() {
         Board board = new Board(network.getMyPlayerNumber());
         initBoardWithWall(board, network);
-        Algorithm algorithm = new Algorithm(board, network);
 
         final int[][][] previousPositions = new int[ClientThreadManager.STONE_COUNT][ClientThreadManager.PREVIOUS_POSITIONS][];
 
@@ -61,7 +60,7 @@ class StoneClient implements Runnable {
             } else if (hasNotMovedTooLong(previousPositions[stone])) {
                 nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
             } else {
-                nextVector = algorithm.getNextVector(stone);
+                nextVector = Algorithm.getNextVector(board, stone);
             }
             network.setMoveDirection(stone, nextVector[0], nextVector[1]);
 

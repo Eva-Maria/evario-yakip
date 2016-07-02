@@ -24,6 +24,7 @@ public class AlgorithmTest extends TestCase {
             };
 
     public void testName() throws Exception {
+        final long start = System.nanoTime();
         final int[][] nodeList = Algorithm.createNodeList(CURRENT_POSITION);
 //         printMatrix(nodeList);
         final int[][] adjacencyMatrix = Algorithm.createAdjacencyMatrix(nodeList, WEIGHT_MATRIX);
@@ -33,28 +34,16 @@ public class AlgorithmTest extends TestCase {
 
         final int[][] paths = Algorithm.getAllPaths(distancesAndPrevious[1]);
 
-        final int[] liftOfNodesWithScore = Algorithm.getScoresFromPathsAndDistances(paths, distancesAndPrevious[1], distancesAndPrevious[0]);
+        final int bestNode = Algorithm.calcBestNodeFromPathsAndDistances(paths, distancesAndPrevious[0]);
 
-        int lowestScore = Integer.MAX_VALUE;
-        int longestPath = 0;
+        final long stop = System.nanoTime();
+        final long diff = stop - start;
+        System.out.println("Time needed: " + diff);
 
-        int bestNode = -1;
-        for (int node = 0; node < liftOfNodesWithScore.length; node++) {
-            final int score = liftOfNodesWithScore[node];
-            final int pathLength = paths[node].length;
-
-            if (lowestScore > score && pathLength > longestPath) {
-                longestPath = pathLength;
-                lowestScore = score;
-                bestNode = node;
-            }
-        }
-
-        System.out.println("Best node is number " + bestNode + " with score " + lowestScore);
+        System.out.println("Best node is number " + bestNode);
         System.out.println("Paths is: " + Arrays.toString(paths[bestNode]));
 
         Assert.assertEquals(26, bestNode);
-        Assert.assertEquals(150, lowestScore);
     }
 
     static void printMatrix(int[] array) {

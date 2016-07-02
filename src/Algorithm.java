@@ -20,7 +20,7 @@ public class Algorithm {
         this.myPlayerNumber = network.getMyPlayerNumber();
     }
 
-    public int[] getNextPath(int stone) {
+    int[] getNextPath(final int stone) {
         final int[][] fields = board.getFields();
 
         final float[][] stonePosition = board.getStonePosition();
@@ -39,7 +39,7 @@ public class Algorithm {
         return null;
     }
 
-    static int[][] createNodeList(float[] currentPosition) {
+    static int[][] createNodeList(final float[] currentPosition) {
         final int[][] nodeList = new int[MAX_PATH_LENGTH][];
         int currentNodeIndex = 0;
 
@@ -64,7 +64,7 @@ public class Algorithm {
         return nodeList;
     }
 
-    int[][] createWeightMatrix(int[][] nodeList, int[][] fields) {
+    int[][] createWeightMatrix(final int[][] nodeList, final int[][] fields) {
         final int distanceMatrix[][] = new int[Board.MAX_Y][Board.MAX_X];
 
         for (final int[] fieldCoordinates : nodeList) {
@@ -90,7 +90,7 @@ public class Algorithm {
         return distanceMatrix;
     }
 
-    static int[][] createAdjacencyMatrix(int[][] nodeList, int[][] weightMatrix) {
+    static int[][] createAdjacencyMatrix(final int[][] nodeList, final int[][] weightMatrix) {
         final int adjacencyMatrix[][] = new int[nodeList.length][nodeList.length];
 
         for (int startNodeIndex = 0; startNodeIndex < nodeList.length - 1; startNodeIndex++) {
@@ -104,13 +104,13 @@ public class Algorithm {
                 final int toX = toFieldCoordinates[0];
                 final int toY = toFieldCoordinates[1];
 
-                boolean isNotNeighbour = !withinLimit(toX, startX - 1, startX + 1) || !withinLimit(toY, startY - 1, startY + 1);
+                final boolean isNotNeighbour = !withinLimit(toX, startX - 1, startX + 1) || !withinLimit(toY, startY - 1, startY + 1);
                 if (isNotNeighbour) {
                     continue;
                 }
 
                 int weight = 0;
-                boolean isNotMyself = !(toX == startX && toY == startY);
+                final boolean isNotMyself = !(toX == startX && toY == startY);
                 if (isNotMyself) {
                     weight = weightMatrix[toY][toX];
                 }
@@ -123,11 +123,11 @@ public class Algorithm {
         return adjacencyMatrix;
     }
 
-    private static boolean withinLimit(int toTest, int start, int stop) {
+    private static boolean withinLimit(final int toTest, final int start, final int stop) {
         return toTest >= start && toTest <= stop;
     }
 
-    static int[][] dijkstra(int[][] adjacencyMatrix) {
+    static int[][] dijkstra(final int[][] adjacencyMatrix) {
         final int listOfNodesWithPrevious[] = new int[MAX_PATH_LENGTH];
         final int listOfNodesWithTotalDistance[] = new int[MAX_PATH_LENGTH];
         final boolean isIncluded[] = new boolean[MAX_PATH_LENGTH];
@@ -167,7 +167,7 @@ public class Algorithm {
         return new int[][]{listOfNodesWithTotalDistance, listOfNodesWithPrevious};
     }
 
-    private static int minDistance(int[] distance, boolean[] isIncluded) {
+    private static int minDistance(final int[] distance, final boolean[] isIncluded) {
         int min = Integer.MAX_VALUE;
         int minIndex = -1;
 
@@ -182,7 +182,7 @@ public class Algorithm {
     }
 
     static int[][] getAllPaths(final int[] listOfNodesWithPrevious) {
-        int[][] paths = new int[listOfNodesWithPrevious.length][];
+        final int[][] paths = new int[listOfNodesWithPrevious.length][];
         for (int node = 0; node < listOfNodesWithPrevious.length; node++) {
             if (listOfNodesWithPrevious[node] == NO_PREVIOUS) {
                 paths[node] = new int[0];
@@ -206,32 +206,40 @@ public class Algorithm {
         }
     }
 
-    static int[] concatArrays(int[] a, int[] b) {
-        int aLen = a.length;
-        int bLen = b.length;
-        int[] c = new int[aLen + bLen];
+    static int[] concatArrays(final int[] a, final int[] b) {
+        final int aLen = a.length;
+        final int bLen = b.length;
+        final int[] c = new int[aLen + bLen];
         System.arraycopy(a, 0, c, 0, aLen);
         System.arraycopy(b, 0, c, aLen, bLen);
         return c;
     }
 
-    static int[] getScoresFromPathsAndDistances(final int[][] paths, final int[] listOfNodesWithPrevious, int[] distances) {
-        final int[] liftOfNodesWithScore = new int[listOfNodesWithPrevious.length];
-        for (int node = 0; node < listOfNodesWithPrevious.length; node++) {
+    static int calcBestNodeFromPathsAndDistances(final int[][] paths, final int[] distances) {
+        int lowestScore = Integer.MAX_VALUE;
+        int longestPath = 0;
 
+        int bestNode = -1;
+
+        for (int node = 0; node < distances.length; node++) {
             final int pathLength = paths[node].length;
-            if (pathLength != 0) {
-                final int distance = distances[node];
-                final int score = (int) (distance * 100f / pathLength);
-                liftOfNodesWithScore[node] = score;
-            } else {
-                liftOfNodesWithScore[node] = Integer.MAX_VALUE;
+            if (pathLength == 0) {
+                continue;
+            }
 
+            final int distance = distances[node];
+            // NB: score  - the lower the better!
+            final int score = (int) (distance * 100f / pathLength);
+
+            if (lowestScore > score && longestPath < pathLength) {
+                longestPath = pathLength;
+                lowestScore = score;
+                bestNode = node;
             }
         }
 
-        // NB: score  - the lower the better!
-        return liftOfNodesWithScore;
+//        System.out.println("Best node is number " + bestNode + " with score " + lowestScore);
+        return bestNode;
     }
 
     private int[] getCoordinatesFromPath(int[] shortestPath, float[] startFieldCoordinates, int[][] nodeList) {

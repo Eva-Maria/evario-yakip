@@ -43,40 +43,41 @@ public class Client implements Runnable {
                 updateBoardWithColors(board, network);
 
                 if (network.getMyPlayerNumber() == 0) {
-                    if (stone == 1) {
-                        float[] nextVector;
-                        if (!hasMoved(previousPositions[stone])) {
-                            nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
-                        } else {
-                            nextVector = algorithm.getNextVector(stone);
-                        }
-                        network.setMoveDirection(stone, nextVector[0], nextVector[1]);
+                    float[] nextVector;
+                    if (hasNotMovedTooLong(previousPositions[stone])) {
+                        nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
                     } else {
-                        network.setMoveDirection(stone, 1, 1);
-                        wait(500);
+                        nextVector = algorithm.getNextVector(stone);
                     }
+                    network.setMoveDirection(stone, nextVector[0], nextVector[1]);
+                    wait(500);
                 } else {
-                    if (stone == 0 && rnd.nextBoolean()) {
-                        network.setMoveDirection(stone, 0.0f, 0.0f);
-                    } else {
-                        network.setMoveDirection(stone, rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f);
-                    }
-                    wait(2000);
+                    moveOpponentRandom(network, rnd, stone);
                 }
             }
         }
+
     }
 
-    private boolean hasMoved(int[][] previousPosition) {
+    private void moveOpponentRandom(NetworkClient network, Random rnd, int stone) {
+        if (stone == 0 && rnd.nextBoolean()) {
+            network.setMoveDirection(stone, 0.0f, 0.0f);
+        } else {
+            network.setMoveDirection(stone, rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f);
+        }
+        wait(2000);
+    }
+
+    private boolean hasNotMovedTooLong(int[][] previousPosition) {
         int[] previous = previousPosition[0];
         for (int i = 1; i < previousPosition.length; i++) {
             final int[] nextPrevious = previousPosition[i];
             if (!Arrays.equals(previous, nextPrevious)) {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     private void updateBoardWithPlayerPosition(Board board, NetworkClient network, int[][][] previousPositions) {

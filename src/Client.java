@@ -1,6 +1,7 @@
 import lenz.htw.yakip.ColorChange;
 import lenz.htw.yakip.net.NetworkClient;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -8,8 +9,13 @@ import java.util.Random;
  */
 public class Client implements Runnable {
 
+    public static final int STONE_COUNT = 3;
+    public static final int PREVIOUS_POSITIONS = 3;
+
     private final String hostname;
     private final long seed;
+
+    private int lastPreviousPosition = 0;
 
     public Client(String hostname, long seed) {
         this.hostname = hostname;
@@ -26,18 +32,24 @@ public class Client implements Runnable {
         initBoardWithWall(board, network);
         Algorithm algorithm = new Algorithm(board, network);
 
-        Random rnd = new Random(seed);
-        while (network.isAlive()) {
-            for (int stone = 0; stone < 3; ++stone) {
+        final int[][][] previousPositions = new int[STONE_COUNT][PREVIOUS_POSITIONS][];
 
-                updateBoardWithPlayerPosition(board, network);
+        Random rnd = new Random(seed);
+
+        while (network.isAlive()) {
+            for (int stone = 0; stone < STONE_COUNT; ++stone) {
+
+                updateBoardWithPlayerPosition(board, network, previousPositions);
                 updateBoardWithColors(board, network);
 
                 if (network.getMyPlayerNumber() == 0) {
                     if (stone == 1) {
-//                    final float[] nextVector = new float[] {1,1};
-                        final float[] nextVector = algorithm.getNextVector(stone);
-
+                        float[] nextVector;
+                        if (!hasMoved(previousPositions[stone])) {
+                            nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
+                        } else {
+                            nextVector = algorithm.getNextVector(stone);
+                        }
                         network.setMoveDirection(stone, nextVector[0], nextVector[1]);
                     } else {
                         network.setMoveDirection(stone, 1, 1);
@@ -55,13 +67,28 @@ public class Client implements Runnable {
         }
     }
 
-    private void updateBoardWithPlayerPosition(Board board, NetworkClient network) {
+    private boolean hasMoved(int[][] previousPosition) {
+        int[] previous = previousPosition[0];
+        for (int i = 1; i < previousPosition.length; i++) {
+            final int[] nextPrevious = previousPosition[i];
+            if (!Arrays.equals(previous, nextPrevious)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void updateBoardWithPlayerPosition(Board board, NetworkClient network, int[][][] previousPositions) {
         int myPlayerNumber = network.getMyPlayerNumber();
-        for (int stone = 0; stone < 3; stone++) {
+        for (int stone = 0; stone < STONE_COUNT; stone++) {
             float x = network.getX(myPlayerNumber, stone);
             float y = network.getY(myPlayerNumber, stone);
             board.setStonePosition(stone, x, y);
+            previousPositions[stone][lastPreviousPosition] = new int[]{(int) x, (int) y};
         }
+
+        lastPreviousPosition = (lastPreviousPosition + 1) % PREVIOUS_POSITIONS;
     }
 
     private void wait(int timeout) {

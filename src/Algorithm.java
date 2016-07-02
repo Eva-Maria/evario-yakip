@@ -1,6 +1,7 @@
 import lenz.htw.yakip.net.NetworkClient;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Created by m on 6/26/16.
@@ -11,13 +12,13 @@ public class Algorithm {
     public static final int CLUSTER_SIZE = 4;
     public static final int MAX_PATH_LENGTH = (CLUSTER_SIZE + CLUSTER_SIZE + 1) * (CLUSTER_SIZE + CLUSTER_SIZE + 1);
 
+    private static final Random rnd = new Random(100);
+
     private final Board board;
     private final int myPlayerNumber;
 
     public Algorithm(Board board, NetworkClient network) {
         this.board = board;
-//        this.network = network;
-
         this.myPlayerNumber = network.getMyPlayerNumber();
     }
 
@@ -292,7 +293,7 @@ public class Algorithm {
     }
 
     static float[] getVectorFromPath(final int[] bestPath, final int[][] nodeList, final float[] currentPosition) {
-        final float CENTER_FIX = (float) Math.random();
+        final float CENTER_FIX = rnd.nextFloat();
 
         final int nextNode = bestPath[1];
         final int[] destination = nodeList[nextNode];

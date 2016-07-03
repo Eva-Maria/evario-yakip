@@ -7,7 +7,7 @@ public class Config {
 
     public static final int[] CLUSTER_SIZE = new int[]{5, 5, 5};
     public static final int[] TIMEOUT_STONES = new int[]{350, 750, 1100};
-    public static final long SEED = 3;
+    public static final long SEED = 8;
 
     // stones: 0 fast, 1 middle, 2 fast
     public static final int[] WEIGHT_EMPTY_FIELD = new int[]{1, 3, 3};

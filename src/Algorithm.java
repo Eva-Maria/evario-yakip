@@ -60,10 +60,21 @@ public class Algorithm {
         if (currentNodeIndex < maxPathLength) {
             final int[][] nodeListResized = new int[currentNodeIndex][];
             System.arraycopy(nodeList, 0, nodeListResized, 0, currentNodeIndex);
+            invertArray(nodeListResized);
             return nodeListResized;
         }
 
+        invertArray(nodeList);
         return nodeList;
+    }
+
+    private static void invertArray(int[][] data) {
+        for (int left = 0, right = data.length - 1; left < right; left++, right--) {
+            // swap the values at the left and right indices
+            int temp[] = data[left];
+            data[left] = data[right];
+            data[right] = temp;
+        }
     }
 
     static int[][] createWeightMatrix(final int[][] nodeList, final int[][] fields, int[][] heatMap, int myPlayerNumber, int stone) {
@@ -75,6 +86,7 @@ public class Algorithm {
 
             final int field = fields[y][x];
             final int heat = heatMap[y][x];
+
             int weight;
             if (field == Board.WALL) {
                 weight = NO_WAY;
@@ -83,7 +95,7 @@ public class Algorithm {
             } else if (field == myPlayerNumber) {
                 weight = Config.WEIGHT_SELF_COLORED_FIELD[stone] + heat; // our color
             } else {
-                weight = Config.WEIGHT_OPPONENT_COLORED_FIELD[stone]; // opponent color field
+                weight = Config.WEIGHT_OPPONENT_COLORED_FIELD[stone] + heat; // opponent color field
             }
 
             distanceMatrix[y][x] = weight;

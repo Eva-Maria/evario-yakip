@@ -1,6 +1,8 @@
 
 import lenz.htw.yakip.Server;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 /**
@@ -25,31 +27,46 @@ public class Launcher {
         if (args.length >= 1) {
             hostName = args[0];
         }
-        if (args.length >= 2) {
-            if (args[1].equals(MODE_AUTO)) {
-                new Thread(serverLauncher).start();
-                waitForServer();
-                new ClientThreadManager(hostName);
-                new ClientThreadManager(hostName);
-                new ClientThreadManager(hostName);
-                return;
-            }
 
-            if (args[1].equals(MODE_FULLAUTO)) {
-                new Thread(serverLauncher).start();
-                waitForServer();
-                new ClientThreadManager(hostName);
-                new ClientThreadManager(hostName);
-                new ClientThreadManager(hostName);
-                new ClientThreadManager(hostName);
-                return;
-            }
+        if (args.length < 2) {
+            new ClientThreadManager(hostName);
+            return;
         }
 
-        new ClientThreadManager(hostName);
+        if (args[1].equals(MODE_AUTO)) {
+            new Thread(serverLauncher).start();
+            waitSomeTime();
+            new ClientThreadManager(hostName);
+            new ClientThreadManager(hostName);
+            new ClientThreadManager(hostName);
+            pressSpace();
+            waitSomeTime();
+            return;
+        }
+
+        if (args[1].equals(MODE_FULLAUTO)) {
+            new Thread(serverLauncher).start();
+            waitSomeTime();
+            new ClientThreadManager(hostName);
+            new ClientThreadManager(hostName);
+            new ClientThreadManager(hostName);
+            new ClientThreadManager(hostName);
+            waitSomeTime();
+            pressSpace();
+        }
     }
 
-    private static void waitForServer() {
+    private static void pressSpace() {
+        try {
+            new Robot().keyPress(KeyEvent.VK_SPACE);
+            waitSomeTime();
+            new Robot().keyRelease(KeyEvent.VK_SPACE);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void waitSomeTime() {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {

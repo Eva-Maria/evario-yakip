@@ -10,6 +10,7 @@ import java.util.Random;
 class StoneClient implements Runnable {
 
     static final String EXCEPTION = "Exception caught. We do NOT stop on exception like other students!";
+    static final float[] DONT_MOVE = new float[]{0.0f, 0.0f};
 
     private final int stone;
     private final NetworkClient network;
@@ -47,7 +48,7 @@ class StoneClient implements Runnable {
 
                 float[] nextVector;
                 if (stone == 0 && !board.isSelfColored(stone)) {
-                    nextVector = new float[]{0.0f, 0.0f};
+                    nextVector = DONT_MOVE;
                 } else if (hasNotMovedTooLong(previousPositions)) {
                     nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
                 } else {

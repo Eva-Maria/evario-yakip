@@ -3,11 +3,11 @@
  */
 public class Board {
 
-    public static final int MAX_Y = 32;
-    public static final int MAX_X = 32;
+    static final int MAX_Y = 32;
+    static final int MAX_X = 32;
 
-    public static final int EMPTY = -2;
-    public static final int WALL = -1;
+    static final int EMPTY = -2;
+    static final int WALL = -1;
 
     final static String RESET_OUTPUT_COLOR = (char) 27 + "[0m";
     final static String UNDERLINE_OUTPUT_COLOR = (char) 27 + "[4m";

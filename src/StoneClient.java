@@ -8,11 +8,12 @@ import java.util.Random;
  * Created by m on 7/2/16.
  */
 class StoneClient implements Runnable {
+
+    static final String EXCEPTION = "Exception caught. We do NOT stop on exception like other students!";
+
     private final int stone;
     private final NetworkClient network;
     private final Board board;
-    private final long seed;
-    private final int timeout;
     private final int myPlayerNumber;
 
     private int lastPreviousPosition = 0;
@@ -23,31 +24,17 @@ class StoneClient implements Runnable {
         this.board = board;
 
         this.myPlayerNumber = network.getMyPlayerNumber();
-
-        this.seed = Config.CLIENT_SEED;
-        this.timeout = getTimeoutForStone(stone);
-    }
-
-    static int getTimeoutForStone(int stone) {
-        switch (stone) {
-            case 0:
-                return 350;
-            case 1:
-                return 750;
-            default:
-            case 2:
-                return 1100;
-        }
     }
 
     @Override
     public void run() {
         final int[][] previousPositions = new int[ClientThreadManager.PREVIOUS_POSITIONS][];
 
-        Random rnd = new Random(seed);
+        final Random rnd = new Random(Config.SEED);
+        final boolean moveRandomOnly = Arrays.binarySearch(Config.MOVE_RANDOM_PLAYERS, myPlayerNumber) >= 0;
 
         while (network.isAlive()) {
-            if (network.getMyPlayerNumber() != 0) {
+            if (moveRandomOnly) {
                 moveRandom(network, rnd, stone);
                 continue;
             }
@@ -70,11 +57,11 @@ class StoneClient implements Runnable {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("Exception caught. We do NOT stop on exception like other students!");
+                System.out.println(EXCEPTION);
             }
 
             final int diff = (int) (System.currentTimeMillis() - start);
-            final int timeoutLeft = timeout - diff;
+            final int timeoutLeft = Config.TIMEOUT_STONES[stone] - diff;
             if (timeoutLeft > 0) {
                 wait(timeoutLeft);
             }

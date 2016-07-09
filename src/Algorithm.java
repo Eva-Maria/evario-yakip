@@ -27,7 +27,7 @@ public class Algorithm {
         final int[][] pathFields = mapNodesToFields(nodeList, bestPath);
         final float[] vector = getVectorFromPath(bestPath, nodeList, currentPosition);
 
-        System.out.println(board.toString(pathFields));
+//        System.out.println(board.toString(pathFields));
 //        System.out.println(stone + ": " + Arrays.toString(vector));
         return vector;
     }

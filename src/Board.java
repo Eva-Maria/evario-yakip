@@ -121,7 +121,7 @@ public class Board {
                         builder.append(" ");
                     } else {
                         String playerOutputColor = PLAYER_OUTPUT_COLORS[field];
-                        builder.append(playerOutputColor).append('#').append(RESET_OUTPUT_COLOR);
+                        builder.append(playerOutputColor).append('#');
                     }
 
                     //////////

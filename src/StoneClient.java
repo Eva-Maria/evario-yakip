@@ -41,18 +41,27 @@ class StoneClient implements Runnable {
             }
 
             final long start = System.currentTimeMillis();
+            boolean waitUntilFieldPassed = false;
 
             try {
                 updateBoardWithPlayerPosition(board, network, previousPositions);
                 updateBoardWithColors(board, network);
 
                 float[] nextVector;
-                if (stone == 0 && !board.isSelfColored(stone)) {
-                    nextVector = DONT_MOVE;
-                } else if (hasNotMovedTooLong(previousPositions)) {
-                    nextVector = new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
+                final boolean selfColored = board.isSelfColored(stone);
+                boolean hasNotMovedTooLong = hasNotMovedTooLong(previousPositions);
+
+                if (stone == 0 && !selfColored) {
+                    if (hasNotMovedTooLong) {
+                        nextVector = getRandomVector(rnd);
+                    } else {
+                        nextVector = DONT_MOVE;
+                    }
+                } else if (hasNotMovedTooLong) {
+                    nextVector = getRandomVector(rnd);
                 } else {
                     nextVector = Algorithm.getNextVector(board, stone);
+                    waitUntilFieldPassed = true;
                 }
                 network.setMoveDirection(stone, nextVector[0], nextVector[1]);
 
@@ -61,12 +70,20 @@ class StoneClient implements Runnable {
                 System.out.println(EXCEPTION);
             }
 
-            final int diff = (int) (System.currentTimeMillis() - start);
-            final int timeoutLeft = Config.TIMEOUT_STONES[stone] - diff;
-            if (timeoutLeft > 0) {
-                wait(timeoutLeft);
+            if (waitUntilFieldPassed) {
+                final int diff = (int) (System.currentTimeMillis() - start);
+                final int timeoutLeft = Config.TIMEOUT_STONES[stone] - diff;
+                if (timeoutLeft > 0) {
+                    wait(timeoutLeft);
+                }
+            } else {
+                wait(60);
             }
         }
+    }
+
+    private float[] getRandomVector(Random rnd) {
+        return new float[]{rnd.nextFloat() - 0.5f, rnd.nextFloat() - 0.5f};
     }
 
     private void moveRandom(NetworkClient network, Random rnd, int stone) {
@@ -101,8 +118,11 @@ class StoneClient implements Runnable {
 
     private void updateBoardWithColors(Board board, NetworkClient network) {
         ColorChange cc;
-        while ((cc = network.getNextColorChange()) != null) {
-            board.setField(cc.x, cc.y, cc.newColor);
+        try {
+            while ((cc = network.getNextColorChange()) != null) {
+                board.setField(cc.x, cc.y, cc.newColor);
+            }
+        } catch (ArrayIndexOutOfBoundsException ignore) {
         }
     }
 

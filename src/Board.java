@@ -96,6 +96,22 @@ public class Board {
             for (int y = Board.MAX_Y - 1; y >= 0; y--) {
                 for (int x = 0; x < Board.MAX_X; x++) {
                     int field = fields[y][x];
+                    //////////
+
+                    boolean isInPath = false;
+                    for (int i = 0; i < path.length; i++) {
+                        int[] shortestPathFieldCoordinate = path[i];
+                        final int spX = shortestPathFieldCoordinate[0];
+                        final int spY = shortestPathFieldCoordinate[1];
+                        if (spX == x && spY == y) {
+                            isInPath = true;
+                            break;
+                        }
+                    }
+
+                    if (isInPath) {
+                        builder.append(UNDERLINE_OUTPUT_COLOR);
+                    }
 
                     //////////
 
@@ -125,23 +141,6 @@ public class Board {
                     }
 
                     //////////
-
-                    boolean isInPath = false;
-                    for (int i = 0; i < path.length; i++) {
-                        int[] shortestPathFieldCoordinate = path[i];
-                        final int spX = shortestPathFieldCoordinate[0];
-                        final int spY = shortestPathFieldCoordinate[1];
-                        if (spX == x && spY == y) {
-                            isInPath = true;
-                            break;
-                        }
-                    }
-
-                    //////////
-
-                    if (isInPath) {
-                        builder.append(UNDERLINE_OUTPUT_COLOR);
-                    }
                     if (stoneOutput != null) {
                         builder.append(stoneOutput);
                     } else {

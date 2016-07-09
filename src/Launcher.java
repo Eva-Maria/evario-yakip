@@ -58,9 +58,10 @@ public class Launcher {
 
     private static void pressSpace() {
         try {
-            new Robot().keyPress(KeyEvent.VK_SPACE);
+            final Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_SPACE);
             waitSomeTime();
-            new Robot().keyRelease(KeyEvent.VK_SPACE);
+            robot.keyRelease(KeyEvent.VK_SPACE);
         } catch (AWTException e) {
             e.printStackTrace();
         }

@@ -53,13 +53,17 @@ class StoneClient implements Runnable {
 
                 if (stone == 0 && !selfColored) {
                     if (hasNotMovedTooLong) {
+//                        printIfStone(0, "self colored random fix");
                         nextVector = getRandomVector(rnd);
                     } else {
+//                        printIfStone(0, "self colored stop");
                         nextVector = DONT_MOVE;
                     }
                 } else if (hasNotMovedTooLong) {
+//                    printIfStone(0, "random");
                     nextVector = getRandomVector(rnd);
                 } else {
+//                    printIfStone(0, "algorithm");
                     nextVector = Algorithm.getNextVector(board, stone);
                     waitUntilFieldPassed = true;
                 }
@@ -77,8 +81,14 @@ class StoneClient implements Runnable {
                     wait(timeoutLeft);
                 }
             } else {
-                wait(60);
+                wait((int) (Config.TIMEOUT_STONES[stone] / 3.5));
             }
+        }
+    }
+
+    void printIfStone(int stone, String msg) {
+        if (stone == this.stone) {
+            System.out.println(msg);
         }
     }
 

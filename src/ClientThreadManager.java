@@ -6,7 +6,7 @@ import lenz.htw.yakip.net.NetworkClient;
 public class ClientThreadManager implements Runnable {
 
     static final int STONE_COUNT = 3;
-    static final int PREVIOUS_POSITIONS = 3;
+    static final int PREVIOUS_POSITIONS = 5;
     private final String hostname;
 
     ClientThreadManager(final String hostname) {

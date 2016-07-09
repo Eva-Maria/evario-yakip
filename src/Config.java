@@ -5,9 +5,9 @@ public class Config {
 
     public static final int[] MOVE_RANDOM_PLAYERS = new int[]{1, 2, 3};
 
-    public static final int[] CLUSTER_SIZE = new int[]{5, 5, 5};
+    public static final int[] CLUSTER_SIZE = new int[]{7, 5, 5};
     public static final int[] TIMEOUT_STONES = new int[]{350, 750, 1100};
-    public static final long SEED = 8;
+    public static final long SEED = 666;
 
     // stones: 0 fast, 1 middle, 2 fast
     public static final int[] WEIGHT_EMPTY_FIELD = new int[]{1, 3, 3};
